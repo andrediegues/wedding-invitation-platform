@@ -1,0 +1,115 @@
+{
+  "_comment": "Single source of truth for the wedding content. Both the website (index.html) and the printed invite (invite.html) read this file. Guest-facing text is in European Portuguese.",
+
+  "couple": {
+    "first": "André",
+    "second": "Flávia",
+    "joined": "André & Flávia"
+  },
+
+  "date": {
+    "iso": "2027-09-24",
+    "display": "Sexta-feira, 24 de setembro de 2027",
+    "short": "24 · 09 · 2027"
+  },
+
+  "timezone": "Europe/Lisbon",
+
+  "events": [
+    {
+      "id": "ceremony",
+      "title": "Cerimónia",
+      "venue": "Igreja do Bonfim",
+      "address": "R. do Monte do Bonfim 72, 4300-350 Porto",
+      "start": "2027-09-24T12:00:00",
+      "end": "2027-09-24T13:15:00",
+      "time": "12h00",
+      "mapQuery": "Igreja do Bonfim, R. do Monte do Bonfim 72, 4300-350 Porto",
+      "mapUrl": "https://www.google.com/maps/place//data=!4m2!3m1!1s0xd24648d251fe483:0x9d3908efee5b25c"
+    },
+    {
+      "id": "reception",
+      "title": "Copo de água",
+      "venue": "Quinta Amadeus",
+      "address": "Av. das Areias 34, Modelos",
+      "start": "2027-09-24T14:30:00",
+      "end": "2027-09-25T02:00:00",
+      "time": "14h30",
+      "mapQuery": "Quinta Amadeus, Av. das Areias 34, Modelos",
+      "mapUrl": "https://www.google.com/maps/place//data=!4m2!3m1!1s0xd248c898f55de55:0x79238a8479d8a1bc"
+    }
+  ],
+
+  "menu": {
+    "draft": true,
+    "note": "Menu provisório — a versão final será publicada aqui.",
+    "courses": [
+      {
+        "title": "Entradas",
+        "items": [
+          "Seleção de queijos e enchidos regionais",
+          "Pataniscas de bacalhau",
+          "Camarão salteado com alho e coentros",
+          "Cogumelos recheados com alheira"
+        ]
+      },
+      {
+        "title": "Prato de peixe",
+        "items": ["Lombo de bacalhau confitado, puré de grão e azeite de ervas"]
+      },
+      {
+        "title": "Corta-sabores",
+        "items": ["Sorbet de limão com espumante"]
+      },
+      {
+        "title": "Prato de carne",
+        "items": ["Lombo de vitela com molho de vinho do Porto, batata assada e legumes da época"]
+      },
+      {
+        "title": "Sobremesa",
+        "items": ["Bolo dos noivos e mesa de doces tradicionais"]
+      },
+      {
+        "title": "Ceia",
+        "items": ["Caldo verde, pão com chouriço e tábua de frios"]
+      }
+    ]
+  },
+
+  "rsvp": {
+    "deadline": "2027-06-24",
+    "deadlineDisplay": "24 de junho de 2027",
+    "finalDeadline": "2027-08-24",
+    "finalDeadlineDisplay": "24 de agosto de 2027",
+    "lateNote": "O prazo de confirmação terminou, mas ainda conseguimos receber a sua resposta. Obrigado por nos avisar o quanto antes!",
+    "closedNote": "As confirmações estão encerradas. Se precisar de alterar a sua resposta, fale diretamente connosco."
+  },
+
+  "contacts": [
+    { "name": "André", "phone": "+351 900 000 000", "_todo": "Replace with real phone number" },
+    { "name": "Flávia", "phone": "+351 900 000 001", "_todo": "Replace with real phone number" }
+  ],
+
+  "info": [
+    {
+      "title": "Entre a igreja e a quinta",
+      "text": "Depois da cerimónia, seguimos para a Quinta Amadeus, em Modelos. Contem com cerca de 35 minutos de carro desde o Bonfim.",
+      "_todo": "Confirm travel time"
+    },
+    {
+      "title": "Estacionamento",
+      "text": "A Quinta Amadeus tem estacionamento para os convidados. Junto à igreja, o estacionamento é limitado — aconselhamos chegar com alguma antecedência.",
+      "_todo": "Confirm parking at both venues"
+    },
+    {
+      "title": "Traje",
+      "text": "Formal. As cores do nosso dia são o azul e o dourado — se quiserem acompanhar-nos, serão muito bem-vindas.",
+      "_todo": "Confirm dress code"
+    },
+    {
+      "title": "Presentes",
+      "text": "A vossa presença é o melhor presente. Para quem desejar, partilharemos aqui o IBAN dos noivos.",
+      "_todo": "Add IBAN or gift list"
+    }
+  ]
+}

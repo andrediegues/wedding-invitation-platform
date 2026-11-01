@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Convites para impressão</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="assets/azulejo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="invite.css">
+  <script src="config.js"></script>
+  <script type="module" src="invite.js"></script>
+</head>
+<body>
+  <aside class="panel" aria-label="Opções de impressão">
+    <h1>Convites para impressão</h1>
+    <p>Formato A5, frente e verso. Cada convite tem o nome da família, um QR code pessoal e o código para confirmar no site.</p>
+    <label for="households">Uma família por linha: <code>CÓDIGO;Nome no convite</code></label>
+    <textarea id="households" rows="7" spellcheck="false" placeholder="ABC123;Família Silva&#10;XYZ789;Avó Rosa e Avô Manuel"></textarea>
+    <p class="panel__hint">Obtém esta lista na Google Sheet em <em>Casamento → Copiar lista para impressão de convites</em>. A lista fica apenas neste browser; nada é enviado.<br>Sem lista, é gerado um convite genérico.</p>
+    <label class="panel__check"><input type="checkbox" id="with-back" checked> Incluir verso (menu e confirmação)</label>
+    <div class="panel__actions">
+      <button type="button" id="generate">Gerar convites</button>
+      <button type="button" id="print" class="primary">Imprimir / guardar PDF</button>
+    </div>
+    <p class="panel__hint">Na janela de impressão escolha <strong>A5</strong>, margens <strong>nenhumas</strong>, <strong>gráficos de fundo</strong> ativos e <strong>frente e verso</strong> (virar pelo lado maior).</p>
+    <p class="panel__count" id="count"></p>
+  </aside>
+
+  <main id="sheets" class="sheets"></main>
+</body>
+</html>

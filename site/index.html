@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>André & Flávia · 24.09.2027</title>
+  <meta name="description" content="Casamento de André e Flávia — 24 de setembro de 2027. Toda a informação e confirmação de presença.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#14294B">
+  <meta property="og:title" content="André & Flávia · 24.09.2027">
+  <meta property="og:description" content="Vamos casar! Toda a informação sobre o nosso dia e a confirmação de presença.">
+  <link rel="icon" href="assets/azulejo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="config.js"></script>
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#rsvp">Saltar para a confirmação de presença</a>
+
+  <header class="topbar" id="topbar">
+    <a class="topbar__mark" href="#top" aria-label="Início">A <span>&amp;</span> F</a>
+    <nav aria-label="Secções">
+      <a href="#dia">O dia</a>
+      <a href="#menu">Menu</a>
+      <a href="#info">Informações</a>
+      <a href="#rsvp" class="topbar__cta">Confirmar</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="frieze" aria-hidden="true"></div>
+      <div class="hero__inner">
+        <p class="hero__greeting" id="greeting" hidden></p>
+        <p class="kicker">Vamos casar</p>
+        <h1 class="hero__names" id="names">André <span class="amp">&amp;</span> Flávia</h1>
+        <div class="sprig-wrap" data-sprig></div>
+        <p class="hero__date" id="hero-date"></p>
+        <p class="hero__place" id="hero-place"></p>
+        <div class="countdown" id="countdown" aria-label="Contagem decrescente"></div>
+        <a class="button button--gold" href="#rsvp">Confirmar presença</a>
+      </div>
+      <div class="frieze frieze--bottom" aria-hidden="true"></div>
+    </section>
+
+    <section class="section" id="dia" aria-labelledby="dia-title">
+      <div class="section__head">
+        <p class="kicker">24 de setembro</p>
+        <h2 id="dia-title">O nosso dia</h2>
+        <div class="sprig-wrap" data-sprig></div>
+      </div>
+      <ol class="timeline" id="events"></ol>
+      <p class="center"><a class="link-button" id="ics" href="#" download="andre-flavia-casamento.ics">Adicionar ao calendário</a></p>
+    </section>
+
+    <section class="section section--tinted" id="menu" aria-labelledby="menu-title">
+      <div class="section__head">
+        <p class="kicker">À mesa</p>
+        <h2 id="menu-title">Menu</h2>
+        <div class="sprig-wrap" data-sprig></div>
+      </div>
+      <div class="menu-card" id="menu-card"></div>
+    </section>
+
+    <section class="section" id="info" aria-labelledby="info-title">
+      <div class="section__head">
+        <p class="kicker">Para saber</p>
+        <h2 id="info-title">Informações</h2>
+        <div class="sprig-wrap" data-sprig></div>
+      </div>
+      <div class="info-grid" id="info-grid"></div>
+    </section>
+
+    <section class="section section--rsvp" id="rsvp" aria-labelledby="rsvp-title">
+      <div class="rsvp-card">
+        <div class="section__head">
+          <p class="kicker" id="rsvp-kicker"></p>
+          <h2 id="rsvp-title">Confirmar presença</h2>
+          <div class="sprig-wrap" data-sprig></div>
+        </div>
+        <div id="rsvp-body" aria-live="polite"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="frieze" aria-hidden="true"></div>
+    <div class="footer__inner">
+      <p class="footer__lead">Alguma dúvida? Liguem-nos.</p>
+      <ul class="contacts" id="contacts"></ul>
+      <p class="footer__sign">Com carinho, <span id="footer-names">André &amp; Flávia</span></p>
+    </div>
+  </footer>
+</body>
+</html>
