@@ -4,8 +4,7 @@
   "couple": {
     "first": "André",
     "second": "Flávia",
-    "joined": "André & Flávia",
-    "initials": ["A", "F"]
+    "joined": "André & Flávia"
   },
 
   "date": {
@@ -16,14 +15,10 @@
 
   "timezone": "Europe/Lisbon",
 
-  "tagline": "Uma noite de música. Uma vida em sintonia.",
-  "motto": "Cada momento, uma nota. Cada nota, uma memória.",
-
   "events": [
     {
       "id": "ceremony",
       "title": "Cerimónia",
-      "movement": "Prelúdio",
       "venue": "Igreja do Bonfim",
       "address": "R. do Monte do Bonfim 72, 4300-350 Porto",
       "start": "2027-09-24T12:00:00",
@@ -35,7 +30,6 @@
     {
       "id": "reception",
       "title": "Copo de água",
-      "movement": "Andamentos & Finale",
       "venue": "Quinta Amadeus",
       "address": "Av. das Areias 34, Modelos",
       "start": "2027-09-24T14:30:00",
@@ -46,23 +40,11 @@
     }
   ],
 
-  "program": {
-    "_todo": "Confirm the structure of the day and add times when known",
-    "movements": [
-      { "label": "Prelúdio", "title": "Cerimónia", "time": "12h00", "icon": "harp" },
-      { "label": "I Andamento", "title": "Receção e cocktail", "time": "14h30", "icon": "glass" },
-      { "label": "II Andamento", "title": "Banquete", "icon": "lyre" },
-      { "label": "III Andamento", "title": "Festa", "icon": "notes" },
-      { "label": "Finale", "title": "Ceia e último brinde", "icon": "toast" }
-    ]
-  },
-
   "menu": {
     "draft": true,
     "note": "Menu provisório — a versão final será publicada aqui.",
     "courses": [
       {
-        "movement": "I · Prelúdio",
         "title": "Entradas",
         "items": [
           "Seleção de queijos e enchidos regionais",
@@ -72,27 +54,22 @@
         ]
       },
       {
-        "movement": "II · Allegro",
         "title": "Prato de peixe",
         "items": ["Lombo de bacalhau confitado, puré de grão e azeite de ervas"]
       },
       {
-        "movement": "Intermezzo",
         "title": "Corta-sabores",
         "items": ["Sorbet de limão com espumante"]
       },
       {
-        "movement": "III · Adagio",
         "title": "Prato de carne",
         "items": ["Lombo de vitela com molho de vinho do Porto, batata assada e legumes da época"]
       },
       {
-        "movement": "IV · Finale",
         "title": "Sobremesa",
         "items": ["Bolo dos noivos e mesa de doces tradicionais"]
       },
       {
-        "movement": "Coda",
         "title": "Ceia",
         "items": ["Caldo verde, pão com chouriço e tábua de frios"]
       }
@@ -115,16 +92,6 @@
 
   "info": [
     {
-      "title": "Traje",
-      "text": "Black tie, com um toque mediterrâneo. Se quiserem acompanhar a paleta do nosso dia, serão muito bem-vindos.",
-      "swatches": [
-        { "name": "Azul profundo", "color": "#1C2F57" },
-        { "name": "Azul mediterrâneo", "color": "#7E9AC0" },
-        { "name": "Dourado claro", "color": "#D4B97A" },
-        { "name": "Marfim", "color": "#F4EEE2" }
-      ]
-    },
-    {
       "title": "Entre a igreja e a quinta",
       "text": "Depois da cerimónia, seguimos para a Quinta Amadeus, em Modelos. Contem com cerca de 35 minutos de carro desde o Bonfim.",
       "_todo": "Confirm travel time"
@@ -133,6 +100,11 @@
       "title": "Estacionamento",
       "text": "A Quinta Amadeus tem estacionamento para os convidados. Junto à igreja, o estacionamento é limitado — aconselhamos chegar com alguma antecedência.",
       "_todo": "Confirm parking at both venues"
+    },
+    {
+      "title": "Traje",
+      "text": "Formal. As cores do nosso dia são o azul e o dourado — se quiserem acompanhar-nos, serão muito bem-vindas.",
+      "_todo": "Confirm dress code"
     },
     {
       "title": "Presentes",
