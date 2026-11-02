@@ -5,6 +5,6 @@
 //           and the demo codes DEMO01 and AVOS22 are accepted.
 // siteUrl — the public URL of the site. Used for the QR codes on printed invites.
 window.APP_CONFIG = {
-  apiUrl: "",
+  apiUrl: "https://script.google.com/macros/s/AKfycbxTDNoDV0o7thBM13_KtJ4A6H6dzpvOMkKwItL5pjVjVYh5Mt-JEn1YguAdQ97LNtiZ3w/exec",
   siteUrl: "https://andrediegues.github.io/wedding-invitation-platform/",
 };
