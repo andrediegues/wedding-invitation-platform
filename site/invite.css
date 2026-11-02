@@ -72,7 +72,7 @@ p { margin: 0; }
 .guest { font-family: var(--script); font-size: 24pt; line-height: 1.25; margin: .5mm 0; }
 .names { font-family: var(--display); font-weight: 400; font-size: 25pt; letter-spacing: .08em; line-height: 1.1; margin-top: 3mm; }
 .names span {
-  display: block; font-family: var(--script); font-size: 24pt; letter-spacing: 0; line-height: 1.1;
+  display: block; font-family: var(--serif); font-style: italic; font-size: 24pt; letter-spacing: 0; line-height: 1.1;
   background: var(--foil); -webkit-background-clip: text; background-clip: text; color: transparent;
 }
 .date { font-family: var(--display); font-size: 13pt; letter-spacing: .32em; color: var(--gold-text); margin-top: 4mm; }
