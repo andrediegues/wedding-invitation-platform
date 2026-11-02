@@ -91,12 +91,10 @@ p { margin: 0; }
   display: flex; justify-content: center; align-items: flex-end; gap: 5mm;
 }
 .photo {
-  width: 25mm; aspect-ratio: 4 / 5; object-fit: cover;
+  width: 27mm; aspect-ratio: 4 / 5; object-fit: cover;
   border-radius: 50% 50% 1mm 1mm / 36% 36% 1mm 1mm;
   border: 1.4mm solid #fffdf8; box-shadow: 0 0 0 .25mm var(--gold-mid);
 }
-.photo--a { transform: rotate(-3deg); }
-.photo--b { transform: rotate(3deg) translateY(-3mm); }
 .olive { width: 26mm; align-self: center; }
 .olive--a { transform: rotate(-12deg); }
 .olive--b { transform: scale(-1, 1) rotate(-12deg); }
