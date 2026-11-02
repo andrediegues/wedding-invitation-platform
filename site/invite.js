@@ -46,7 +46,12 @@ function front(c, h) {
         <div class="events">${eventBlock(c.events[0])}<span class="events__rule"></span>${eventBlock(c.events[1])}</div>
         <p class="tagline">${esc(c.tagline)}</p>
       </div>
-      <img class="art" src="assets/hero.svg" alt="">
+      <div class="photos" aria-hidden="true">
+        <img class="olive olive--a" src="assets/olive.svg" alt="">
+        <img class="photo photo--a" src="assets/photo-1.jpg" alt="">
+        <img class="photo photo--b" src="assets/photo-2.jpg" alt="">
+        <img class="olive olive--b" src="assets/olive.svg" alt="">
+      </div>
     </section>`;
 }
 

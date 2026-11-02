@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 120">
+  <filter id="w" x="-10%" y="-10%" width="120%" height="120%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="3"/>
+    <feDisplacementMap in="SourceGraphic" scale="3.5" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <g filter="url(#w)">
+    <path d="M6 104 C70 92 130 62 214 18" stroke="#6B6A45" stroke-width="1.8" fill="none"/>
+    <ellipse cx="30" cy="94" rx="17" ry="5.4" transform="rotate(-38 30 94)" fill="#86935E"/>
+    <ellipse cx="50" cy="104" rx="17" ry="5.4" transform="rotate(16 50 104)" fill="#5E6B3C"/>
+    <ellipse cx="66" cy="82" rx="17" ry="5.4" transform="rotate(-44 66 82)" fill="#76834F"/>
+    <ellipse cx="90" cy="90" rx="17" ry="5.4" transform="rotate(12 90 90)" fill="#86935E"/>
+    <ellipse cx="98" cy="66" rx="17" ry="5.4" transform="rotate(-50 98 66)" fill="#5E6B3C"/>
+    <ellipse cx="124" cy="72" rx="16" ry="5.2" transform="rotate(2 124 72)" fill="#76834F"/>
+    <ellipse cx="134" cy="50" rx="16" ry="5.2" transform="rotate(-54 134 50)" fill="#86935E"/>
+    <ellipse cx="158" cy="54" rx="15" ry="5" transform="rotate(-8 158 54)" fill="#5E6B3C"/>
+    <ellipse cx="168" cy="34" rx="14" ry="4.8" transform="rotate(-58 168 34)" fill="#76834F"/>
+    <ellipse cx="190" cy="34" rx="13" ry="4.6" transform="rotate(-20 190 34)" fill="#86935E"/>
+    <ellipse cx="204" cy="20" rx="11" ry="4.2" transform="rotate(-40 204 20)" fill="#5E6B3C"/>
+    <ellipse cx="78" cy="100" rx="5" ry="6" fill="#1C2F57" opacity="0.85"/>
+    <ellipse cx="114" cy="82" rx="5" ry="6" fill="#1C2F57" opacity="0.85"/>
+    <ellipse cx="148" cy="66" rx="4.6" ry="5.6" fill="#2B4A80" opacity="0.85"/>
+  </g>
+</svg>
