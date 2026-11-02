@@ -131,20 +131,112 @@ const remoteApi = {
 
 export const api = config.apiUrl ? remoteApi : demoApi;
 
-// ---------- Decorative SVG ----------
+// ---------- Decorative SVG (theme: classical music × Mediterranean) ----------
 
-export const OLIVE_SPRIG = `
-<svg class="sprig" viewBox="0 0 160 24" aria-hidden="true" focusable="false">
-  <path d="M4 12 H156" stroke="currentColor" stroke-width="1" fill="none"/>
-  <g fill="currentColor">
-    <ellipse cx="80" cy="12" rx="3.2" ry="3.2"/>
-    <ellipse cx="62" cy="7.5" rx="7" ry="2.6" transform="rotate(-24 62 7.5)"/>
-    <ellipse cx="62" cy="16.5" rx="7" ry="2.6" transform="rotate(24 62 16.5)"/>
-    <ellipse cx="44" cy="8.5" rx="6" ry="2.2" transform="rotate(-24 44 8.5)"/>
-    <ellipse cx="44" cy="15.5" rx="6" ry="2.2" transform="rotate(24 44 15.5)"/>
-    <ellipse cx="98" cy="7.5" rx="7" ry="2.6" transform="rotate(24 98 7.5)"/>
-    <ellipse cx="98" cy="16.5" rx="7" ry="2.6" transform="rotate(-24 98 16.5)"/>
-    <ellipse cx="116" cy="8.5" rx="6" ry="2.2" transform="rotate(24 116 8.5)"/>
-    <ellipse cx="116" cy="15.5" rx="6" ry="2.2" transform="rotate(-24 116 15.5)"/>
-  </g>
-</svg>`;
+const svgOpen = (viewBox, cls) =>
+  `<svg class="${cls}" viewBox="${viewBox}" aria-hidden="true" focusable="false">`;
+
+// Line icons, 48×48, drawn with currentColor.
+const ICON_PATHS = {
+  lyre: `
+    <path d="M17 40 C9 34 8 20 12 10 C13.5 6.5 17 7 16 10.5"/>
+    <path d="M31 40 C39 34 40 20 36 10 C34.5 6.5 31 7 32 10.5"/>
+    <path d="M13 15 Q24 11 35 15"/><path d="M15 41 H33"/>
+    <path d="M20 14 V40 M24 13.3 V40 M28 14 V40"/>`,
+  harp: `
+    <path d="M12 42 V7 C24 9 32 24 38 42 Z"/>
+    <path d="M16.5 9.2 V42 M21 11 V42 M25.5 14.5 V42 M30 20 V42 M34 28 V42"/>
+    <path d="M9 42 H41"/>`,
+  glass: `
+    <path d="M12 12 Q24 28 36 12 Z"/><path d="M24 21 V39"/><path d="M16.5 39 H31.5"/>
+    <path d="M17 16.5 H31"/>`,
+  notes: `
+    <ellipse cx="15" cy="36" rx="4.6" ry="3.4" transform="rotate(-20 15 36)" fill="currentColor"/>
+    <ellipse cx="33" cy="32" rx="4.6" ry="3.4" transform="rotate(-20 33 32)" fill="currentColor"/>
+    <path d="M19.2 35 V12 M37.2 31 V8"/><path d="M19.2 12 L37.2 8" stroke-width="3"/>`,
+  toast: `
+    <g transform="rotate(-14 17 24)"><path d="M14 8 H20 L19.5 22 C19 25.5 14.5 25.5 14.5 22 Z"/><path d="M17 24.5 V38 M13.5 38 H20.5"/></g>
+    <g transform="rotate(14 31 24)"><path d="M28 8 H34 L33.5 22 C33 25.5 28.5 25.5 28.5 22 Z"/><path d="M31 24.5 V38 M27.5 38 H34.5"/></g>
+    <path d="M24 2 V6.5 M19.5 3.5 L21.5 7 M28.5 3.5 L26.5 7"/>`,
+};
+
+export function icon(name, cls = "icon") {
+  return `${svgOpen("0 0 48 48", cls)}<g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">${ICON_PATHS[name] || ICON_PATHS.lyre}</g></svg>`;
+}
+
+// Olive wreath, open at the top, 200×200 — filled olive leaves with navy olives.
+export function wreath(cls = "wreath") {
+  const leaves = [];
+  const cx = 100, cy = 104, r = 76;
+  const colours = ["#5E6B3C", "#76834F", "#8E9A67"];
+  [1, -1].forEach((side) => {
+    let i = 0;
+    for (let a = 102; a <= 248; a += 9, i++) {
+      const th = ((side === 1 ? a : 180 - a) * Math.PI) / 180;
+      const x = cx + r * Math.cos(th);
+      const y = cy + r * Math.sin(th);
+      const tangent = (th * 180) / Math.PI + 90;
+      const tilt = (i % 2 ? -32 : 32) * side;
+      const out = i % 2 ? -5 : 5;
+      const lx = x + out * Math.cos(th);
+      const ly = y + out * Math.sin(th);
+      leaves.push(`<ellipse cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" rx="13" ry="4.4" transform="rotate(${(tangent + tilt).toFixed(0)} ${lx.toFixed(1)} ${ly.toFixed(1)})" fill="${colours[i % 3]}"/>`);
+    }
+  });
+  const stems = `
+    <path d="M${cx - 10} ${cy + r - 1} A${r} ${r} 0 0 1 ${cx - 28} ${cy - r + 6}" fill="none" stroke="#6B6A45" stroke-width="1.2"/>
+    <path d="M${cx + 10} ${cy + r - 1} A${r} ${r} 0 0 0 ${cx + 28} ${cy - r + 6}" fill="none" stroke="#6B6A45" stroke-width="1.2"/>`;
+  const olives = [[44, 152], [156, 152], [27, 104], [173, 104], [38, 62], [162, 62]]
+    .map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="3.2" ry="4" fill="#1C2F57"/>`).join("");
+  return `${svgOpen("0 0 200 200", cls)}${stems}${leaves.join("")}${olives}</svg>`;
+}
+
+// Monogram: lyre over "A | F" inside the olive wreath.
+export function monogram(initials = ["A", "F"], cls = "monogram") {
+  return `
+    <div class="${cls}" aria-hidden="true">
+      ${wreath(`${cls}__wreath`)}
+      <span class="${cls}__lyre">${icon("lyre", `${cls}__lyre-icon`)}</span>
+      <span class="${cls}__letters">${esc(initials[0])}<i></i>${esc(initials[1])}</span>
+    </div>`;
+}
+
+// A flowing five-line staff with a few notes, 600×90.
+export function staff(cls = "staff") {
+  const lines = [0, 1, 2, 3, 4].map((k) => {
+    const y = 34 + k * 7;
+    return `<path d="M0 ${y} C120 ${y - 18} 220 ${y + 18} 330 ${y} S520 ${y - 16} 600 ${y - 4}"/>`;
+  }).join("");
+  const note = (x, y, up = true, flag = false) => `
+    <ellipse cx="${x}" cy="${y}" rx="5" ry="3.7" transform="rotate(-20 ${x} ${y})" fill="currentColor" stroke="none"/>
+    <path d="M${x + 4.4} ${y - 1} V${y - 26}"/>${flag ? `<path d="M${x + 4.4} ${y - 26} q8 6 6 16"/>` : ""}`;
+  const pair = (x1, y1, x2, y2) => `${note(x1, y1)}${note(x2, y2)}<path d="M${x1 + 4.4} ${y1 - 26} L${x2 + 4.4} ${y2 - 26}" stroke-width="3"/>`;
+  return `${svgOpen("0 0 600 90", cls)}
+    <g fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.55">${lines}</g>
+    <text x="6" y="70" font-family="'Noto Music', serif" font-size="58" fill="currentColor">𝄞</text>
+    <g fill="none" stroke="currentColor" stroke-width="1.2">
+      ${pair(120, 42, 150, 35)}${note(205, 50, true, true)}${pair(290, 47, 318, 40)}
+      ${note(400, 33, true, true)}${pair(470, 30, 500, 24)}${note(560, 29)}
+    </g></svg>`;
+}
+
+// Gold wax seal with the couple's initials.
+export function seal(initials = ["A", "F"], cls = "seal") {
+  return `
+    <div class="${cls}" aria-hidden="true">
+      <svg viewBox="0 0 100 100" focusable="false">
+        <defs>
+          <filter id="seal-wobble" x="-10%" y="-10%" width="120%" height="120%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="11"/>
+            <feDisplacementMap in="SourceGraphic" scale="8" xChannelSelector="R" yChannelSelector="G"/>
+          </filter>
+          <radialGradient id="seal-gold" cx="0.38" cy="0.32" r="0.8">
+            <stop offset="0" stop-color="#F1DFAE"/><stop offset="0.55" stop-color="#C9A45C"/><stop offset="1" stop-color="#94743A"/>
+          </radialGradient>
+        </defs>
+        <g filter="url(#seal-wobble)"><circle cx="50" cy="50" r="44" fill="url(#seal-gold)"/></g>
+        <circle cx="50" cy="50" r="33" fill="none" stroke="#9A7B3C" stroke-width="1.5" opacity="0.8"/>
+      </svg>
+      <span>${esc(initials[0])}${esc(initials[1])}</span>
+    </div>`;
+}

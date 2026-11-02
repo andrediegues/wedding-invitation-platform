@@ -1,5 +1,5 @@
 import {
-  api, codeFromUrl, esc, loadContent, normalizeCode, OLIVE_SPRIG, rsvpPhase, zonedDate,
+  api, codeFromUrl, esc, icon, loadContent, monogram, normalizeCode, rsvpPhase, seal, staff, zonedDate,
 } from "./shared.js";
 
 const $ = (sel) => document.querySelector(sel);
@@ -18,45 +18,67 @@ function forgetCode() {
 // ---------------------------------------------------------------- render: static content
 
 function renderStatic(c) {
-  document.querySelectorAll("[data-sprig]").forEach((el) => { el.innerHTML = OLIVE_SPRIG; });
+  document.querySelectorAll("[data-monogram]").forEach((el) => { el.innerHTML = monogram(c.couple.initials); });
+  document.querySelectorAll("[data-staff]").forEach((el) => { el.innerHTML = staff(); });
+  document.querySelectorAll("[data-seal]").forEach((el) => { el.innerHTML = seal(c.couple.initials); });
 
-  $("#names").innerHTML = `${esc(c.couple.first)} <span class="amp">&amp;</span> ${esc(c.couple.second)}`;
+  $("#names").innerHTML = `${esc(c.couple.first)} <span>&amp;</span> ${esc(c.couple.second)}`;
   $("#footer-names").textContent = c.couple.joined;
-  $("#hero-date").textContent = c.date.display;
-  $("#hero-place").textContent = c.events.map((e) => e.venue).join(" · ");
+  $("#hero-date").textContent = c.date.short;
+  $("#tagline").textContent = c.tagline;
+  $("#motto").textContent = c.motto;
+  $("#footer-motto").textContent = c.motto;
+
+  $("#program").innerHTML = c.program.movements.map((m) => `
+    <li class="movement">
+      <p class="movement__label">${esc(m.label)}</p>
+      ${icon(m.icon, "movement__icon")}
+      <p class="movement__title">${esc(m.title)}</p>
+      ${m.time ? `<p class="movement__time">${esc(m.time)}</p>` : ""}
+    </li>`).join("");
 
   $("#events").innerHTML = c.events.map((e) => {
     const maps = e.mapUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(e.mapQuery)}`;
     const waze = `https://waze.com/ul?q=${encodeURIComponent(e.mapQuery)}&navigate=yes`;
     return `
-      <li class="event">
-        <div class="event__time">${esc(e.time)}</div>
-        <div class="event__body">
-          <h3>${esc(e.title)}</h3>
-          <p class="event__venue">${esc(e.venue)}</p>
-          <p class="event__address">${esc(e.address)}</p>
-          <div class="event__links">
-            <a class="chip" href="${esc(maps)}" target="_blank" rel="noopener">Google Maps</a>
-            <a class="chip" href="${esc(waze)}" target="_blank" rel="noopener">Waze</a>
-          </div>
+      <article class="venue">
+        <p class="caps caps--gold">${esc(e.movement)}</p>
+        <h3>${esc(e.title)}</h3>
+        <p class="venue__time">${esc(e.time)}</p>
+        <p class="venue__name">${esc(e.venue)}</p>
+        <p class="venue__address">${esc(e.address)}</p>
+        <div class="venue__links">
+          <a class="chip" href="${esc(maps)}" target="_blank" rel="noopener">Google Maps</a>
+          <a class="chip" href="${esc(waze)}" target="_blank" rel="noopener">Waze</a>
         </div>
-      </li>`;
+      </article>`;
   }).join("");
 
   const m = c.menu;
   $("#menu-card").innerHTML = `
+    <header class="score__head">
+      <span class="score__lines" aria-hidden="true"></span>
+      <h3>${esc(c.couple.joined)}</h3>
+      <p>${esc(c.date.short)}</p>
+    </header>
     ${m.draft ? `<p class="badge">${esc(m.note)}</p>` : ""}
-    ${m.courses.map((course) => `
-      <div class="course">
-        <h3>${esc(course.title)}</h3>
-        ${course.items.map((i) => `<p>${esc(i)}</p>`).join("")}
-      </div>`).join('<span class="course__sep" aria-hidden="true">✦</span>')}
-  `;
+    <ol class="score__courses">
+      ${m.courses.map((course) => `
+        <li class="course">
+          <p class="course__movement">${esc(course.movement || "")}</p>
+          <div>
+            <h4>${esc(course.title)}</h4>
+            ${course.items.map((i) => `<p>${esc(i)}</p>`).join("")}
+          </div>
+        </li>`).join("")}
+    </ol>`;
 
   $("#info-grid").innerHTML = c.info.map((i) => `
     <article class="info-card">
       <h3>${esc(i.title)}</h3>
       <p>${esc(i.text)}</p>
+      ${i.swatches ? `<ul class="swatches">${i.swatches.map((s) => `
+        <li><span style="background:${esc(s.color)}"></span>${esc(s.name)}</li>`).join("")}</ul>` : ""}
     </article>`).join("");
 
   $("#contacts").innerHTML = c.contacts.map((p) => `

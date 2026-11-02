@@ -1,4 +1,4 @@
-import { esc, loadContent, normalizeCode, OLIVE_SPRIG, personalLink } from "./shared.js";
+import { esc, loadContent, monogram, normalizeCode, personalLink, staff } from "./shared.js";
 import qrcode from "./vendor/qrcode.mjs";
 
 const $ = (sel) => document.querySelector(sel);
@@ -24,7 +24,6 @@ function parseList(raw) {
 }
 
 function front(c, h) {
-  const [ceremony, reception] = c.events;
   const eventBlock = (e) => `
     <div class="ev">
       <p class="ev__title">${esc(e.title)}</p>
@@ -34,20 +33,20 @@ function front(c, h) {
     </div>`;
   return `
     <section class="sheet sheet--front">
-      <div class="band"></div>
       <div class="sheet__body">
-        <p class="kicker">Vamos casar</p>
+        ${monogram(c.couple.initials, "mono")}
         ${h.name ? `
           <p class="intro">Com muita alegria, convidamos</p>
           <p class="guest">${esc(h.name)}</p>
           <p class="intro">para celebrar connosco o nosso casamento</p>
-        ` : `<p class="intro">Com muita alegria, convidamos-vos a celebrar connosco o nosso casamento</p>`}
-        <h2 class="names">${esc(c.couple.first)}<span class="amp">&amp;</span>${esc(c.couple.second)}</h2>
-        <div class="sprig-wrap">${OLIVE_SPRIG}</div>
-        <p class="date">${esc(c.date.display)}</p>
-        <div class="events">${eventBlock(ceremony)}<span class="events__rule"></span>${eventBlock(reception)}</div>
+        ` : `<p class="intro">Com muita alegria, convidamos-vos<br>a celebrar connosco o nosso casamento</p>`}
+        <h2 class="names">${esc(c.couple.first)}<span>&amp;</span>${esc(c.couple.second)}</h2>
+        <p class="date">${esc(c.date.short)}</p>
+        <p class="weekday">${esc(c.date.display.split(",")[0])} · Porto</p>
+        <div class="events">${eventBlock(c.events[0])}<span class="events__rule"></span>${eventBlock(c.events[1])}</div>
+        <p class="tagline">${esc(c.tagline)}</p>
       </div>
-      <div class="band band--bottom"></div>
+      <img class="art" src="assets/hero.svg" alt="">
     </section>`;
 }
 
@@ -62,17 +61,17 @@ function back(c, h) {
         <div class="menu">
           <p class="kicker">Menu</p>
           ${c.menu.courses.map((course) => `
-            <p class="course"><span>${esc(course.title)}</span>${course.items.map(esc).join(" · ")}</p>`).join("")}
+            <p class="course"><span>${esc(course.movement || course.title)}</span>${course.items.map(esc).join(" · ")}</p>`).join("")}
         </div>
-        <div class="sprig-wrap">${OLIVE_SPRIG}</div>
+        <div class="staff-wrap">${staff()}</div>
         <div class="rsvp">
           <p class="rsvp__title">Confirme a sua presença<br>até ${esc(c.rsvp.deadlineDisplay)}</p>
           <div class="rsvp__grid">
-            <div class="rsvp__phones">
+            <div>
               <p class="rsvp__how">Por telefone</p>
               ${phones}
             </div>
-            <div class="rsvp__qr">
+            <div>
               <p class="rsvp__how">Ou com o telemóvel</p>
               <div class="qr">${qrSvg(link)}</div>
               ${h.code ? `<p class="code">Código <strong>${esc(h.code)}</strong></p>` : ""}
@@ -80,8 +79,8 @@ function back(c, h) {
           </div>
           <p class="site">${esc(shortLink)}</p>
         </div>
+        <p class="motto">${esc(c.motto)}</p>
       </div>
-      <div class="band band--bottom"></div>
     </section>`;
 }
 
