@@ -4,12 +4,19 @@ import {
 
 const $ = (sel) => document.querySelector(sel);
 const CODE_KEY = "wedding-guest-code";
+const NAME_KEY = "wedding-responder-name";
 
 function rememberCode(code) {
   try { localStorage.setItem(CODE_KEY, code); } catch { /* ignore */ }
 }
 function recallCode() {
   try { return localStorage.getItem(CODE_KEY) || ""; } catch { return ""; }
+}
+function rememberName(name) {
+  try { localStorage.setItem(NAME_KEY, name); } catch { /* ignore */ }
+}
+function recallName() {
+  try { return localStorage.getItem(NAME_KEY) || ""; } catch { return ""; }
 }
 function forgetCode() {
   try { localStorage.removeItem(CODE_KEY); } catch { /* ignore */ }
@@ -257,6 +264,11 @@ function renderForm() {
       </p>
       ${state.phase === "late" ? `<p class="notice">${esc(r.lateNote)}</p>` : ""}
 
+      <label class="field">
+        <span class="field__label">O seu nome <em>(quem está a responder)</em></span>
+        <input name="by" maxlength="80" autocomplete="name" value="${esc(recallName())}" required>
+      </label>
+
       <fieldset class="choice">
         <legend class="field__label">Vão estar connosco?</legend>
         <label class="choice__option">
@@ -325,6 +337,8 @@ function renderForm() {
     ev.preventDefault();
     const err = $("#form-error");
     const fail = (msg, el) => { err.textContent = msg; err.hidden = false; if (el) el.focus(); };
+    const by = form.by.value.trim();
+    if (!by) return fail("Por favor escreva o seu nome.", form.by);
     const attending = form.attending.value;
     if (!attending) return fail("Por favor indique se vão estar connosco.");
 
@@ -357,6 +371,7 @@ function renderForm() {
       names: peopleOut.map((p) => p.name).join(", "),
       dietary: peopleOut.filter((p) => p.allergies).map((p) => `${p.name}: ${p.allergies}`).join("; "),
       message: form.message.value.trim(),
+      by,
     };
     err.hidden = true;
     const btn = form.querySelector('button[type="submit"]');
@@ -365,6 +380,7 @@ function renderForm() {
     try {
       const res = await api.submit(payload);
       if (!res.ok) throw new Error(res.error || "error");
+      rememberName(by);
       state.household.response = { ...payload, updatedAt: new Date().toISOString() };
       renderSummary({ justSent: true });
     } catch (e) {
@@ -376,6 +392,21 @@ function renderForm() {
       err.hidden = false;
     }
   });
+}
+
+function firstName(full) {
+  return String(full || "").trim().split(/\s+/)[0] || "";
+}
+
+// "A Maria respondeu por vocês a 3 de novembro." — so the rest of the family knows it's done.
+function answeredBy(r) {
+  const when = r.updatedAt
+    ? new Date(r.updatedAt).toLocaleDateString("pt-PT", { day: "numeric", month: "long", timeZone: "Europe/Lisbon" })
+    : "";
+  const date = when ? ` a ${esc(when)}` : "";
+  if (r.by) return `${esc(r.by)} respondeu por vocês${date}.`;
+  if (r.via && r.via !== "Site") return `Recebemos a vossa resposta${date}, por ${esc(r.via.toLowerCase())}.`;
+  return when ? `Resposta recebida${date}.` : "";
 }
 
 function renderSummary({ justSent = false } = {}) {
@@ -397,12 +428,14 @@ function renderSummary({ justSent = false } = {}) {
       ${r.dietary ? `<p class="summary__line"><span>Restrições</span>${esc(r.dietary)}</p>` : ""}`;
   $("#rsvp-body").innerHTML = `
     <div class="summary ${yes ? "summary--yes" : ""}">
-      <p class="summary__title">${justSent ? "Obrigado!" : "Já recebemos a vossa resposta"}</p>
+      <p class="summary__title">${justSent ? `Obrigado${r.by ? `, ${esc(firstName(r.by))}` : ""}!` : "Já recebemos a vossa resposta"}</p>
+      ${!justSent ? `<p class="summary__by">${answeredBy(r)}</p>` : ""}
       <p class="lead">${yes
         ? `Contamos convosco: <strong>${r.count} ${Number(r.count) === 1 ? "pessoa" : "pessoas"}</strong>. Até dia 24 de setembro!`
         : "Vamos sentir a vossa falta. Obrigado por nos avisarem."}</p>
       ${yes ? peopleHtml : ""}
       ${canEdit ? `<button type="button" class="button button--ghost" id="edit">Alterar resposta</button>` : ""}
+      ${canEdit && !justSent ? `<p class="hint">Se algo mudou, qualquer pessoa da família pode alterar a resposta.</p>` : ""}
     </div>`;
   if (canEdit) $("#edit").addEventListener("click", renderForm);
 }

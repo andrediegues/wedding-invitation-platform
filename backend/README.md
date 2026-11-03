@@ -43,9 +43,15 @@ code and to save answers. Nothing about the guests is stored in this repository.
   `Resumo` counts each dish and the guests with allergies.
 - **Alerts:** every new or changed answer is emailed to the script owner. To include more people,
   set `NOTIFY_EMAILS` at the top of `Code.gs` (e.g. `"a@example.com,b@example.com"`).
-- **Reminders:** *Casamento → Atualizar lembretes* rebuilds the `Lembretes` tab with every household that
-  has not answered, its personal link and an "Abrir WhatsApp" link with the message ready (needs a
-  mobile number in `Contacto`). With weekly reminders on, a summary email arrives every Monday at 9:00
+- **Contacts:** `Contactos` takes one or more phones per household, separated by commas, optionally
+  with a first name: `Maria 912 345 678, João 913 456 789`. Everyone gets the same family link.
+- **Sending the invite:** *Casamento → Preparar envio do convite* builds the `Envio do convite` tab with
+  one row per person (households with a digital invite), an "Enviar convite" WhatsApp link with the
+  message ready and an "Enviado?" checkbox.
+- **Who answered:** the site asks for the name of the person answering (`Respondido por`). Other family
+  members opening the link see "Maria respondeu por vocês a 3 de novembro" and can still change it.
+- **Reminders:** *Casamento → Atualizar lembretes* rebuilds the `Lembretes` tab with one row per
+  contact of every household that has not answered, with an "Enviar lembrete" WhatsApp link. With weekly reminders on, a summary email arrives every Monday at 9:00
   from 6 weeks before the first deadline until the final deadline.
 - Answers received by phone or in person: fill the same columns by hand and set `Via`.
 - `Notas` is for you only; the website never reads it. Column `Detalhe (não editar)` is hidden and used by the site.

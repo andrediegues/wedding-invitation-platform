@@ -25,6 +25,7 @@ const LOG_SHEET = "Respostas";
 const SUMMARY_SHEET = "Resumo";
 const DISHES_SHEET = "Pratos";
 const REMINDERS_SHEET = "Lembretes";
+const SENDING_SHEET = "Envio do convite";
 const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no 0/O, 1/I
 const CODE_LENGTH = 6;
 
@@ -34,7 +35,7 @@ const HEADERS = [
   "Nome no convite",        // B  e.g. "Família Silva"
   "Lugares",                // C  seats reserved for the household
   "Tipo de convite",        // D  Digital / Físico / Ambos
-  "Contacto",               // E  phone (used for WhatsApp reminders)
+  "Contactos",              // E  one or more phones, e.g. "Maria 912 345 678, João 913 456 789"
   "Resposta",               // F  Sim / Não (empty = pending)
   "Nº confirmados",         // G
   "Nomes",                  // H
@@ -44,10 +45,11 @@ const HEADERS = [
   "Via",                    // L  Site / Telefone / Pessoalmente
   "Notas",                  // M  free text for the couple, never shown to guests
   "Detalhe (não editar)",   // N  per-guest choices as JSON, written by the site
+  "Respondido por",         // O  who answered on the site
 ];
 const COL = {
   code: 1, name: 2, seats: 3, inviteType: 4, contact: 5, response: 6, count: 7,
-  names: 8, dietary: 9, message: 10, updatedAt: 11, via: 12, notes: 13, detail: 14,
+  names: 8, dietary: 9, message: 10, updatedAt: 11, via: 12, notes: 13, detail: 14, by: 15,
 };
 const DISH_HEADERS = ["Código", "Nome no convite", "Convidado", "Prato de peixe", "Prato de carne", "Notas (alergias, vegetariano/vegan)", "Atualizado em"];
 
@@ -59,6 +61,7 @@ function onOpen() {
     .addItem("1. Preparar folhas", "setup")
     .addItem("2. Gerar códigos em falta", "generateMissingCodes")
     .addSeparator()
+    .addItem("Preparar envio do convite (WhatsApp)", "prepareInviteSending")
     .addItem("Atualizar lembretes (quem falta responder)", "refreshReminders")
     .addItem("Ativar lembretes semanais por email", "enableWeeklyReminders")
     .addItem("Desativar lembretes semanais", "disableWeeklyReminders")
@@ -90,8 +93,8 @@ function setup() {
     SpreadsheetApp.newDataValidation().requireNumberBetween(1, 20).setAllowInvalid(false).build());
 
   const log = ss.getSheetByName(LOG_SHEET) || ss.insertSheet(LOG_SHEET);
-  log.getRange(1, 1, 1, 8).setValues([[
-    "Data", "Código", "Nome no convite", "Resposta", "Nº confirmados", "Nomes", "Restrições alimentares", "Mensagem",
+  log.getRange(1, 1, 1, 9).setValues([[
+    "Data", "Código", "Nome no convite", "Resposta", "Nº confirmados", "Nomes", "Restrições alimentares", "Mensagem", "Respondido por",
   ]]).setFontWeight("bold");
   log.setFrozenRows(1);
 
@@ -163,30 +166,49 @@ function showPrintList() {
 
 // ------------------------------------------------------------------ reminders
 
-/** Rebuilds the "Lembretes" tab: every household without an answer, with its link and a ready WhatsApp message. */
+/** Rebuilds the "Lembretes" tab: one row per contact of every household without an answer, with a ready WhatsApp message. */
 function refreshReminders() {
-  const ss = SpreadsheetApp.getActive();
-  const sheet = ss.getSheetByName(REMINDERS_SHEET) || ss.insertSheet(REMINDERS_SHEET);
-  sheet.clear();
   const pending = pendingHouseholds_();
-  const header = ["Nome no convite", "Lugares", "Tipo de convite", "Contacto", "Link pessoal", "Enviar por WhatsApp"];
+  const n = writeContactSheet_(REMINDERS_SHEET, pending, reminderText_, "Enviar lembrete");
+  SpreadsheetApp.getActive().toast(`${pending.length} família(s) por responder (${n} contacto(s)).`, "Lembretes");
+}
+
+/** Builds the "Envio do convite" tab: one row per contact of every household, with the invite message ready to send. */
+function prepareInviteSending() {
+  const households = allHouseholds_().filter((h) => h.inviteType !== "Físico");
+  const n = writeContactSheet_(SENDING_SHEET, households, inviteText_, "Enviar convite");
+  SpreadsheetApp.getActive().toast(`${households.length} família(s), ${n} contacto(s).`, "Envio do convite");
+}
+
+/** One row per person: household, person, number, personal link and a WhatsApp link with the message ready. */
+function writeContactSheet_(sheetName, households, textFn, linkLabel) {
+  const ss = SpreadsheetApp.getActive();
+  const sheet = ss.getSheetByName(sheetName) || ss.insertSheet(sheetName);
+  sheet.clear();
+  const header = ["Nome no convite", "Lugares", "Tipo de convite", "Pessoa", "Telemóvel", "Link pessoal", "WhatsApp", "Enviado?"];
   sheet.getRange(1, 1, 1, header.length).setValues([header]).setFontWeight("bold")
     .setBackground("#0c3362").setFontColor("#ffffff");
   sheet.setFrozenRows(1);
-  if (pending.length) {
-    const rows = pending.map((h) => {
-      const link = personalLink_(h.code);
-      const phone = whatsappNumber_(h.contact);
-      const wa = phone
-        ? `=HYPERLINK("https://wa.me/${phone}?text=${encodeURIComponent(reminderText_(h.name, link))}","Abrir WhatsApp")`
+  const rows = [];
+  households.forEach((h) => {
+    const link = personalLink_(h.code);
+    const people = contacts_(h.contact);
+    if (!people.length) people.push({ name: "", phone: "", raw: "" });
+    people.forEach((c) => {
+      const greeting = c.name || h.name;
+      const wa = c.phone
+        ? `=HYPERLINK("https://wa.me/${c.phone}?text=${encodeURIComponent(textFn(greeting, link, h.code))}","${linkLabel}")`
         : "sem telemóvel";
-      return [h.name, h.seats, h.inviteType, h.contact, link, wa];
+      rows.push([h.name, h.seats, h.inviteType, c.name, c.raw, link, wa, false]);
     });
+  });
+  if (rows.length) {
     sheet.getRange(2, 1, rows.length, header.length).setValues(rows);
+    sheet.getRange(2, header.length, rows.length, 1).insertCheckboxes();
   }
-  sheet.autoResizeColumns(1, 4);
-  sheet.setColumnWidth(5, 360);
-  ss.toast(`${pending.length} família(s) por responder.`, "Lembretes");
+  sheet.autoResizeColumns(1, 5);
+  sheet.setColumnWidth(6, 360);
+  return rows.filter((r) => r[6] !== "sem telemóvel").length;
 }
 
 /** Weekly email to the couple with who is still missing, from 6 weeks before the first deadline until the final one. */
@@ -271,6 +293,8 @@ function lookup_(code) {
         dietary: String(r[COL.dietary - 1] || ""),
         message: String(r[COL.message - 1] || ""),
         people,
+        by: String(r[COL.by - 1] || ""),
+        via: String(r[COL.via - 1] || ""),
         updatedAt: r[COL.updatedAt - 1] ? new Date(r[COL.updatedAt - 1]).toISOString() : null,
       } : null,
     },
@@ -311,14 +335,15 @@ function saveRsvp_(body) {
       ? (people.length ? people.filter((p) => p.allergies).map((p) => `${p.name}: ${p.allergies}`).join("; ") : clean_(body.dietary, 300))
       : "";
     const message = clean_(body.message, 1000);
+    const by = clean_(body.by, 80);
     const now = new Date();
     const answer = attending === "yes" ? "Sim" : "Não";
 
     found.sheet.getRange(found.row, COL.response, 1, 7).setValues([[answer, count, names, dietary, message, now, "Site"]]);
-    found.sheet.getRange(found.row, COL.detail).setValue(JSON.stringify(people));
-    SpreadsheetApp.getActive().getSheetByName(LOG_SHEET).appendRow([now, code, household, answer, count, names, dietary, message]);
+    found.sheet.getRange(found.row, COL.detail, 1, 2).setValues([[JSON.stringify(people), by]]);
+    SpreadsheetApp.getActive().getSheetByName(LOG_SHEET).appendRow([now, code, household, answer, count, names, dietary, message, by]);
     writeDishes_(code, household, people, now);
-    record = { code, household, answer, count, seats, people, message, dietary, names };
+    record = { code, household, answer, count, seats, people, message, dietary, names, by };
   } finally {
     lock.releaseLock();
   }
@@ -353,7 +378,7 @@ function notify_(r) {
       to: notifyTo_(),
       subject: `RSVP: ${r.household} — ${r.answer === "Sim" ? `Sim (${r.count} de ${r.seats})` : "Não vem"}`,
       htmlBody:
-        `<p><b>${escapeHtml_(r.household)}</b> respondeu <b>${r.answer}</b>${r.answer === "Sim" ? ` — ${r.count} de ${r.seats} lugares` : ""}.</p>` +
+        `<p><b>${escapeHtml_(r.household)}</b>${r.by ? ` (por ${escapeHtml_(r.by)})` : ""} respondeu <b>${r.answer}</b>${r.answer === "Sim" ? ` — ${r.count} de ${r.seats} lugares` : ""}.</p>` +
         guests +
         (r.message ? `<p>Mensagem: “${escapeHtml_(r.message)}”</p>` : "") +
         `<p><a href="${SpreadsheetApp.getActive().getUrl()}">Abrir a folha</a></p>`,
@@ -371,15 +396,33 @@ function guestRows_() {
   return last < 2 ? [] : sheet.getRange(2, 1, last - 1, HEADERS.length).getValues();
 }
 
-function pendingHouseholds_() {
+function allHouseholds_() {
   return guestRows_()
-    .filter((r) => r[COL.code - 1] && r[COL.name - 1] && !r[COL.response - 1])
+    .filter((r) => r[COL.code - 1] && r[COL.name - 1])
     .map((r) => ({
       code: normalizeCode_(r[COL.code - 1]),
       name: String(r[COL.name - 1]),
       seats: Number(r[COL.seats - 1]) || 1,
       inviteType: String(r[COL.inviteType - 1] || ""),
       contact: String(r[COL.contact - 1] || ""),
+      answered: !!r[COL.response - 1],
+    }));
+}
+
+function pendingHouseholds_() {
+  return allHouseholds_().filter((h) => !h.answered);
+}
+
+/** "Maria 912 345 678, João +351 913 456 789; 914 567 890" → [{ name, phone, raw }, …] */
+function contacts_(raw) {
+  return String(raw || "")
+    .split(/[,;\n]+/)
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .map((part) => ({
+      name: part.replace(/[+\d().\-\s]+/g, " ").trim(),
+      phone: whatsappNumber_(part),
+      raw: (part.match(/[+\d][\d\s().\-]{6,}/) || [part])[0].trim(),
     }));
 }
 
@@ -394,6 +437,11 @@ function findRow_(code) {
 
 function personalLink_(code) {
   return `${SITE_URL}?c=${encodeURIComponent(code)}`;
+}
+
+function inviteText_(name, link, code) {
+  return `Olá, ${name}! Com muita alegria, convidamos-vos para o nosso casamento, a 24 de setembro de 2027. ` +
+    `Aqui está toda a informação e a resposta ao convite: ${link}\nUm beijinho, ${COUPLE}`;
 }
 
 function reminderText_(name, link) {
