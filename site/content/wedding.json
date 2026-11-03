@@ -36,72 +36,73 @@
     }
   ],
   "menu": {
-    "draft": true,
+    "draft": false,
     "note": "Menu provisório — a versão final será publicada aqui.",
     "courses": [
       {
         "title": "Entradas",
         "items": [
-          "Seleção de queijos e enchidos regionais",
-          "Pataniscas de bacalhau",
-          "Camarão salteado com alho e coentros",
-          "Cogumelos recheados com alheira"
+          "Variedade de entradas quentes e frias"
+        ]
+      },
+      {
+        "title": "Sopa",
+        "items": [
+          "Creme de legumes"
         ]
       },
       {
         "title": "Prato de peixe",
-        "items": [
-          "Lombo de bacalhau confitado, puré de grão e azeite de ervas",
-          "Filete de robalo grelhado com risotto de limão"
-        ],
         "choice": "fish",
+        "items": [
+          "Bacalhau à moda do chefe com molho de cebolada e puré",
+          "Filetes de pescada com arroz de cenoura"
+        ],
         "options": [
           {
             "id": "bacalhau",
-            "label": "Lombo de bacalhau confitado"
+            "label": "Bacalhau à moda do chefe"
           },
           {
-            "id": "robalo",
-            "label": "Filete de robalo grelhado"
+            "id": "pescada",
+            "label": "Filetes de pescada"
           }
-        ],
-        "_todo": "Dummy options — replace when the menu is final"
+        ]
       },
       {
         "title": "Corta-sabores",
         "items": [
-          "Sorbet de limão com espumante"
+          "Sorvete de lima"
         ]
       },
       {
         "title": "Prato de carne",
-        "items": [
-          "Lombo de vitela com molho de vinho do Porto, batata assada e legumes da época",
-          "Bochecha de porco preto estufada com puré de batata-doce"
-        ],
         "choice": "meat",
+        "items": [
+          "Vitela em massa folhada com molho de frutos do bosque",
+          "Lombo de porco assado"
+        ],
         "options": [
           {
             "id": "vitela",
-            "label": "Lombo de vitela"
+            "label": "Vitela em massa folhada"
           },
           {
             "id": "porco",
-            "label": "Bochecha de porco preto"
+            "label": "Lombo de porco assado"
           }
-        ],
-        "_todo": "Dummy options — replace when the menu is final"
+        ]
       },
       {
         "title": "Sobremesa",
         "items": [
-          "Bolo dos noivos e mesa de doces tradicionais"
+          "À brasileira"
         ]
       },
       {
         "title": "Ceia",
         "items": [
-          "Caldo verde, pão com chouriço e tábua de frios"
+          "Caldo verde e bifanas no pão"
         ]
       }
     ],
