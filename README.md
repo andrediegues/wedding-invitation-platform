@@ -16,8 +16,8 @@ with the same information for guests who prefer paper.
 ## Design
 
 Navy and gold: palette #0C3362 · #6EA6CD · #C3D3E0 · #DCAD79 · #F4E7D6, navy/gold alcohol-ink
-marble bands, a pale blue silk background with gold sparkles, and an arched A F monogram with
-waves and a scallop shell (`site/assets/monogram.webp`, cut from the couple's reference).
+marble bands, a pale blue silk background with gold sparkles, and an A F monogram in a gold ring with
+flowers, a gold swash and a wave (`site/assets/monogram.webp`, cut from the couple's reference).
 
 ## How it works
 

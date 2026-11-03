@@ -142,4 +142,4 @@ export const DIVIDER = `
 </svg>`;
 
 // Monogram from the couple's chosen reference (arched gold frame, A F, star, waves, shell).
-export const MONOGRAM = `<img class="monogram" src="assets/monogram.webp" width="600" height="835" alt="Monograma A F com moldura dourada em arco, estrela, ondas e concha">`;
+export const MONOGRAM = `<img class="monogram" src="assets/monogram.webp" width="600" height="794" alt="Monograma A F com aro dourado, flores azul e marfim, laço dourado e onda">`;

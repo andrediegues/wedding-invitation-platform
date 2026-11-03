@@ -114,7 +114,7 @@ p { margin: 0; }
   .sheet:last-child { break-after: auto; page-break-after: auto; }
 }
 
-.mono { width: 26mm; margin-bottom: 3mm; }
+.mono { width: 32mm; margin-bottom: 2mm; }
 .monogram { display: block; width: 100%; height: auto; overflow: visible; }
 .sheet--front .names { margin-top: 4mm; font-size: 32pt; }
 .sheet--front .events { margin-top: 5mm; }
