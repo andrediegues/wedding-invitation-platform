@@ -307,3 +307,35 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--b
 .contacts li span { display: block; font-size: .78rem; letter-spacing: .2em; text-transform: uppercase; color: var(--gold-deep); }
 .contacts a { font-size: 1.15rem; text-decoration: none; }
 .footer__sign { font-family: var(--serif); font-style: italic; font-size: 1.3rem; color: var(--muted); margin: 0; }
+
+/* ------------------------------------------------------------------ meal choices & allergies */
+.course__choice {
+  font-family: var(--sans); font-style: normal; font-size: .62rem; letter-spacing: .14em;
+  color: var(--gold-deep); background: rgba(220, 173, 121, .18); border-radius: 999px; padding: 2px 8px; margin-left: 4px;
+}
+.course__or { font-family: var(--sans); font-size: .72rem !important; letter-spacing: .2em; text-transform: uppercase; color: var(--gold-deep); margin: .1rem 0 !important; }
+.menu-note { margin: 1.6rem 0 0; font-style: italic; color: var(--muted); font-size: .98rem; }
+
+.hint--left { text-align: left; margin: 0 0 1rem; }
+.guest {
+  border: 1px solid var(--gold-soft); border-radius: 12px; background: var(--cream);
+  padding: 14px 16px 2px; margin: 0 0 16px;
+}
+.guest legend {
+  font-family: var(--serif); font-size: 1.25rem; color: var(--ink); padding: 0 6px;
+}
+.guest .field { margin-bottom: 1rem; }
+@media (min-width: 560px) {
+  .guest { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+  .guest > legend { grid-column: 1 / -1; }
+  .guest > .field:first-of-type, .guest > .field:last-of-type { grid-column: 1 / -1; }
+}
+
+.guest-summary { list-style: none; padding: 0; margin: 1rem 0 0; display: grid; gap: 10px; text-align: left; }
+.guest-summary li {
+  border: 1px solid var(--gold-soft); border-radius: 10px; padding: 10px 14px; background: var(--cream);
+  display: flex; flex-direction: column; gap: 2px;
+}
+.guest-summary strong { font-weight: 500; }
+.guest-summary span { color: var(--muted); font-size: .95rem; }
+.guest-summary__allergy { color: var(--gold-deep) !important; }

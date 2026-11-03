@@ -49,9 +49,12 @@ function renderStatic(c) {
     ${m.draft ? `<p class="badge">${esc(m.note)}</p>` : ""}
     ${m.courses.map((course) => `
       <div class="course">
-        <h3>${esc(course.title)}</h3>
-        ${course.items.map((i) => `<p>${esc(i)}</p>`).join("")}
+        <h3>${esc(course.title)}${course.choice ? ` <em class="course__choice">à escolha</em>` : ""}</h3>
+        ${course.choice
+          ? course.items.map((i) => `<p>${esc(i)}</p>`).join('<p class="course__or">ou</p>')
+          : course.items.map((i) => `<p>${esc(i)}</p>`).join("")}
       </div>`).join('<span class="course__sep" aria-hidden="true">✦</span>')}
+    ${m.choiceNote && m.courses.some((x) => x.choice) ? `<p class="menu-note">${esc(m.choiceNote)}</p>` : ""}
   `;
 
   $("#info-grid").innerHTML = c.info.map((i) => `
@@ -194,12 +197,56 @@ function renderClosed() {
     <p class="center">${contactLine()}</p>`;
 }
 
+// ---------------------------------------------------------------- per-guest meal choices
+
+function choiceCourses() {
+  return state.content.menu.courses.filter((c) => c.choice && Array.isArray(c.options));
+}
+
+function optionLabel(courseKey, id) {
+  const course = choiceCourses().find((c) => c.choice === courseKey);
+  const opt = course && course.options.find((o) => o.id === id);
+  return opt ? opt.label : "";
+}
+
+function previousPeople(prev, seats) {
+  if (Array.isArray(prev.people) && prev.people.length) return prev.people;
+  const names = String(prev.names || "").split(/\s*[,;\n]\s*/).filter(Boolean);
+  return Array.from({ length: Math.max(names.length, 1) }, (_, i) => ({ name: names[i] || "" })).slice(0, seats);
+}
+
+function personFieldset(i, person = {}) {
+  const selects = choiceCourses().map((c) => `
+    <label class="field field--inline">
+      <span class="field__label">${esc(c.title)}</span>
+      <select name="${c.choice}-${i}" required>
+        <option value="">Escolha…</option>
+        ${c.options.map((o) => `<option value="${esc(o.id)}" ${person[c.choice] === o.id ? "selected" : ""}>${esc(o.label)}</option>`).join("")}
+      </select>
+    </label>`).join("");
+  return `
+    <fieldset class="guest" data-guest="${i}">
+      <legend>Convidado ${i + 1}</legend>
+      <label class="field">
+        <span class="field__label">Nome</span>
+        <input name="name-${i}" maxlength="120" autocomplete="off" value="${esc(person.name || "")}" required>
+      </label>
+      ${selects}
+      <label class="field">
+        <span class="field__label">Alergias ou intolerâncias <em>(opcional)</em></span>
+        <input name="allergies-${i}" maxlength="200" value="${esc(person.allergies || "")}" placeholder="Ex.: marisco, glúten, frutos secos">
+      </label>
+    </fieldset>`;
+}
+
 function renderForm() {
   const h = state.household;
   const prev = h.response || {};
   const r = state.content.rsvp;
+  const people = previousPeople(prev, h.seats);
+  const startCount = prev.attending === "yes" && prev.count ? Number(prev.count) : h.seats;
   const seatOptions = Array.from({ length: h.seats }, (_, i) => i + 1)
-    .map((n) => `<option value="${n}" ${Number(prev.count || h.seats) === n ? "selected" : ""}>${n}</option>`)
+    .map((n) => `<option value="${n}" ${startCount === n ? "selected" : ""}>${n}</option>`)
     .join("");
 
   $("#rsvp-body").innerHTML = `
@@ -227,14 +274,8 @@ function renderForm() {
           <span class="field__label">Quantas pessoas vêm?</span>
           <select name="count">${seatOptions}</select>
         </label>` : `<input type="hidden" name="count" value="1">`}
-        <label class="field">
-          <span class="field__label">Nomes de quem vem</span>
-          <textarea name="names" rows="2" maxlength="400" placeholder="Ex.: Maria Silva, João Silva">${esc(prev.names || "")}</textarea>
-        </label>
-        <label class="field">
-          <span class="field__label">Alergias ou restrições alimentares <em>(opcional)</em></span>
-          <input name="dietary" maxlength="300" value="${esc(prev.dietary || "")}" placeholder="Ex.: vegetariano, sem glúten">
-        </label>
+        <p class="hint hint--left">Para cada pessoa, escolha o prato de peixe e o prato de carne e indique alergias, se houver.</p>
+        <div id="guests"></div>
       </div>
 
       <label class="field">
@@ -249,6 +290,24 @@ function renderForm() {
 
   const form = $("#rsvp-form");
   const yesOnly = $("#yes-only");
+  const guests = $("#guests");
+
+  // Keep what was typed when the number of guests changes.
+  const readPeople = () => Array.from(guests.querySelectorAll("[data-guest]")).map((fs) => {
+    const i = fs.dataset.guest;
+    const person = { name: form[`name-${i}`].value.trim(), allergies: form[`allergies-${i}`].value.trim() };
+    choiceCourses().forEach((c) => { person[c.choice] = form[`${c.choice}-${i}`].value; });
+    return person;
+  });
+  let draft = people;
+  const drawGuests = () => {
+    if (guests.children.length) draft = readPeople().concat(draft.slice(guests.children.length));
+    const n = Number(form.count.value) || 1;
+    guests.innerHTML = Array.from({ length: n }, (_, i) => personFieldset(i, draft[i])).join("");
+  };
+  if (form.count.tagName === "SELECT") form.count.addEventListener("change", drawGuests);
+  drawGuests();
+
   const sync = () => { yesOnly.hidden = form.attending.value !== "yes"; };
   form.querySelectorAll('input[name="attending"]').forEach((el) => el.addEventListener("change", sync));
   sync();
@@ -264,26 +323,37 @@ function renderForm() {
   form.addEventListener("submit", async (ev) => {
     ev.preventDefault();
     const err = $("#form-error");
+    const fail = (msg, el) => { err.textContent = msg; err.hidden = false; if (el) el.focus(); };
     const attending = form.attending.value;
-    if (!attending) {
-      err.textContent = "Por favor indique se vão estar connosco.";
-      err.hidden = false;
-      return;
+    if (!attending) return fail("Por favor indique se vão estar connosco.");
+
+    let peopleOut = [];
+    if (attending === "yes") {
+      peopleOut = readPeople();
+      for (let i = 0; i < peopleOut.length; i++) {
+        if (!peopleOut[i].name) return fail(`Por favor escreva o nome do convidado ${i + 1}.`, form[`name-${i}`]);
+        for (const c of choiceCourses()) {
+          if (!peopleOut[i][c.choice]) {
+            return fail(`Por favor escolha o ${c.title.toLowerCase()} de ${peopleOut[i].name}.`, form[`${c.choice}-${i}`]);
+          }
+        }
+      }
     }
+    // send the readable dish names too, so the sheet shows them as they appear on the menu
+    peopleOut = peopleOut.map((p) => ({
+      ...p,
+      labels: Object.fromEntries(choiceCourses().map((c) => [c.choice, optionLabel(c.choice, p[c.choice])])),
+    }));
     const payload = {
       code: h.code,
       attending,
-      count: attending === "yes" ? Number(form.count.value) : 0,
-      names: attending === "yes" ? form.names.value.trim() : "",
-      dietary: attending === "yes" ? form.dietary.value.trim() : "",
+      count: peopleOut.length,
+      people: peopleOut,
+      // flat summaries, kept for the sheet's main tab and older backends
+      names: peopleOut.map((p) => p.name).join(", "),
+      dietary: peopleOut.filter((p) => p.allergies).map((p) => `${p.name}: ${p.allergies}`).join("; "),
       message: form.message.value.trim(),
     };
-    if (attending === "yes" && !payload.names) {
-      err.textContent = "Por favor escreva os nomes de quem vem.";
-      err.hidden = false;
-      form.names.focus();
-      return;
-    }
     err.hidden = true;
     const btn = form.querySelector('button[type="submit"]');
     btn.disabled = true;
@@ -309,14 +379,25 @@ function renderSummary({ justSent = false } = {}) {
   const r = h.response;
   const yes = r.attending === "yes";
   const canEdit = state.phase !== "closed";
+  const people = Array.isArray(r.people) && r.people.length ? r.people : null;
+  const peopleHtml = people ? `
+    <ul class="guest-summary">
+      ${people.map((p) => `
+        <li>
+          <strong>${esc(p.name)}</strong>
+          <span>${choiceCourses().map((c) => esc(optionLabel(c.choice, p[c.choice]))).filter(Boolean).join(" · ")}</span>
+          ${p.allergies ? `<span class="guest-summary__allergy">Alergias: ${esc(p.allergies)}</span>` : ""}
+        </li>`).join("")}
+    </ul>` : `
+      ${r.names ? `<p class="summary__line"><span>Quem vem</span>${esc(r.names)}</p>` : ""}
+      ${r.dietary ? `<p class="summary__line"><span>Restrições</span>${esc(r.dietary)}</p>` : ""}`;
   $("#rsvp-body").innerHTML = `
     <div class="summary ${yes ? "summary--yes" : ""}">
       <p class="summary__title">${justSent ? "Obrigado!" : "Já recebemos a vossa resposta"}</p>
       <p class="lead">${yes
         ? `Contamos convosco: <strong>${r.count} ${Number(r.count) === 1 ? "pessoa" : "pessoas"}</strong>. Até dia 24 de setembro!`
         : "Vamos sentir a vossa falta. Obrigado por nos avisarem."}</p>
-      ${yes && r.names ? `<p class="summary__line"><span>Quem vem</span>${esc(r.names)}</p>` : ""}
-      ${yes && r.dietary ? `<p class="summary__line"><span>Restrições</span>${esc(r.dietary)}</p>` : ""}
+      ${yes ? peopleHtml : ""}
       ${canEdit ? `<button type="button" class="button button--ghost" id="edit">Alterar resposta</button>` : ""}
     </div>`;
   if (canEdit) $("#edit").addEventListener("click", renderForm);

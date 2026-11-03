@@ -28,11 +28,27 @@ code and to save answers. Nothing about the guests is stored in this repository.
 > After editing `Code.gs` later, use *Deploy → Manage deployments → Edit → New version*
 > so the same `/exec` URL keeps working.
 
+## Updating the script (after a change to `Code.gs`)
+
+1. In Apps Script, replace the contents of `Code.gs` with the new version and save.
+2. *Deploy → Manage deployments → ✏️ Edit → Version: New version → Deploy*. The `/exec` URL stays the same.
+3. Reload the spreadsheet and run *Casamento → 1. Preparar folhas* (adds the `Pratos` tab and the new totals; your data is kept).
+4. Run *Casamento → Enviar email de teste* once and accept the new permissions (sending email, scheduled triggers).
+5. Optional: *Casamento → Ativar lembretes semanais por email*.
+
 ## Day-to-day
 
 - Answers from the website fill columns `Resposta` → `Via` automatically (Via = "Site").
+- Each guest's fish and meat choice and allergies go to the `Pratos` tab (one row per person);
+  `Resumo` counts each dish and the guests with allergies.
+- **Alerts:** every new or changed answer is emailed to the script owner. To include more people,
+  set `NOTIFY_EMAILS` at the top of `Code.gs` (e.g. `"a@example.com,b@example.com"`).
+- **Reminders:** *Casamento → Atualizar lembretes* rebuilds the `Lembretes` tab with every household that
+  has not answered, its personal link and an "Abrir WhatsApp" link with the message ready (needs a
+  mobile number in `Contacto`). With weekly reminders on, a summary email arrives every Monday at 9:00
+  from 6 weeks before the first deadline until the final deadline.
 - Answers received by phone or in person: fill the same columns by hand and set `Via`.
-- `Notas` is for you only; the website never reads it.
+- `Notas` is for you only; the website never reads it. Column `Detalhe (não editar)` is hidden and used by the site.
 - Guests can change their answer until the final deadline (`FINAL_DEADLINE` in `Code.gs`).
 - *Casamento → Copiar lista para impressão de convites* gives the `CODE;Name` list for
   households with a physical invite, ready to paste into `invite.html`.
@@ -42,6 +58,6 @@ code and to save answers. Nothing about the guests is stored in this repository.
 | Request | Response |
 |---|---|
 | `GET ?action=lookup&code=ABC123` | `{ ok, household: { code, name, seats, response \| null } }` or `{ ok: false, error: "not_found" }` |
-| `POST` body `{ action: "rsvp", code, attending: "yes"\|"no", count, names, dietary, message }` sent as `text/plain` | `{ ok: true }` or `{ ok: false, error: "not_found" \| "closed" \| "bad_request" }` |
+| `POST` body `{ action: "rsvp", code, attending: "yes"\|"no", people: [{ name, fish, meat, allergies, labels }], message }` sent as `text/plain` | `{ ok: true }` or `{ ok: false, error: "not_found" \| "closed" \| "bad_request" }` |
 
 The POST uses `text/plain` on purpose: it avoids a CORS preflight, which Apps Script cannot answer.

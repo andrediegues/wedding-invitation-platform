@@ -11,33 +11,45 @@
 
 // ------------------------------------------------------------------ settings
 
-const FINAL_DEADLINE = "2027-08-24"; // after this day (Europe/Lisbon) the site stops accepting answers
+const FINAL_DEADLINE = "2027-08-24";  // after this day (Europe/Lisbon) the site stops accepting answers
+const FIRST_DEADLINE = "2027-06-24";  // the deadline printed on the invites
+const SITE_URL = "https://andrediegues.github.io/wedding-invitation-platform/";
+const COUPLE = "André & Flávia";
+
+// Who gets an email for every new or changed answer. Empty = the account that owns the script.
+// Several addresses: "a@example.com,b@example.com"
+const NOTIFY_EMAILS = "";
+
 const GUESTS_SHEET = "Convidados";
 const LOG_SHEET = "Respostas";
 const SUMMARY_SHEET = "Resumo";
+const DISHES_SHEET = "Pratos";
+const REMINDERS_SHEET = "Lembretes";
 const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no 0/O, 1/I
 const CODE_LENGTH = 6;
 
 // Column order of the "Convidados" sheet. Do not reorder without updating COL.
 const HEADERS = [
-  "Código",               // A
-  "Nome no convite",      // B  e.g. "Família Silva"
-  "Lugares",              // C  seats reserved for the household
-  "Tipo de convite",      // D  Digital / Físico / Ambos
-  "Contacto",             // E
-  "Resposta",             // F  Sim / Não (empty = pending)
-  "Nº confirmados",       // G
-  "Nomes",                // H
+  "Código",                 // A
+  "Nome no convite",        // B  e.g. "Família Silva"
+  "Lugares",                // C  seats reserved for the household
+  "Tipo de convite",        // D  Digital / Físico / Ambos
+  "Contacto",               // E  phone (used for WhatsApp reminders)
+  "Resposta",               // F  Sim / Não (empty = pending)
+  "Nº confirmados",         // G
+  "Nomes",                  // H
   "Restrições alimentares", // I
-  "Mensagem",             // J
-  "Atualizado em",        // K
-  "Via",                  // L  Site / Telefone / Pessoalmente
-  "Notas",                // M  free text for the couple, never shown to guests
+  "Mensagem",               // J
+  "Atualizado em",          // K
+  "Via",                    // L  Site / Telefone / Pessoalmente
+  "Notas",                  // M  free text for the couple, never shown to guests
+  "Detalhe (não editar)",   // N  per-guest choices as JSON, written by the site
 ];
 const COL = {
   code: 1, name: 2, seats: 3, inviteType: 4, contact: 5, response: 6, count: 7,
-  names: 8, dietary: 9, message: 10, updatedAt: 11, via: 12, notes: 13,
+  names: 8, dietary: 9, message: 10, updatedAt: 11, via: 12, notes: 13, detail: 14,
 };
+const DISH_HEADERS = ["Código", "Nome no convite", "Convidado", "Prato de peixe", "Prato de carne", "Alergias", "Atualizado em"];
 
 // ------------------------------------------------------------------ menu
 
@@ -46,6 +58,12 @@ function onOpen() {
     .createMenu("Casamento")
     .addItem("1. Preparar folhas", "setup")
     .addItem("2. Gerar códigos em falta", "generateMissingCodes")
+    .addSeparator()
+    .addItem("Atualizar lembretes (quem falta responder)", "refreshReminders")
+    .addItem("Ativar lembretes semanais por email", "enableWeeklyReminders")
+    .addItem("Desativar lembretes semanais", "disableWeeklyReminders")
+    .addSeparator()
+    .addItem("Enviar email de teste", "sendTestEmail")
     .addItem("Copiar lista para impressão de convites", "showPrintList")
     .addToUi();
 }
@@ -56,11 +74,12 @@ function setup() {
 
   const guests = ss.getSheetByName(GUESTS_SHEET) || ss.insertSheet(GUESTS_SHEET, 0);
   guests.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS])
-    .setFontWeight("bold").setBackground("#14294b").setFontColor("#ffffff");
+    .setFontWeight("bold").setBackground("#0c3362").setFontColor("#ffffff");
   guests.setFrozenRows(1);
   guests.setColumnWidth(COL.name, 220);
   guests.setColumnWidth(COL.names, 260);
   guests.setColumnWidth(COL.message, 260);
+  guests.hideColumns(COL.detail);
 
   const rows = guests.getMaxRows() - 1;
   const rule = (values) => SpreadsheetApp.newDataValidation().requireValueInList(values, true).setAllowInvalid(false).build();
@@ -76,9 +95,17 @@ function setup() {
   ]]).setFontWeight("bold");
   log.setFrozenRows(1);
 
+  const dishes = ss.getSheetByName(DISHES_SHEET) || ss.insertSheet(DISHES_SHEET);
+  dishes.getRange(1, 1, 1, DISH_HEADERS.length).setValues([DISH_HEADERS]).setFontWeight("bold");
+  dishes.setFrozenRows(1);
+  dishes.setColumnWidth(3, 200);
+  dishes.setColumnWidth(6, 240);
+
   const summary = ss.getSheetByName(SUMMARY_SHEET) || ss.insertSheet(SUMMARY_SHEET);
+  summary.clear();
   const g = `'${GUESTS_SHEET}'`;
-  summary.getRange("A1:B8").setValues([
+  const d = `'${DISHES_SHEET}'`;
+  summary.getRange("A1:B9").setValues([
     ["Resumo", ""],
     ["Convites (famílias)", `=COUNTA(${g}!B2:B)`],
     ["Lugares reservados", `=SUM(${g}!C2:C)`],
@@ -86,10 +113,17 @@ function setup() {
     ["Famílias por responder", `=B2-B4`],
     ["Pessoas confirmadas", `=SUMIF(${g}!F2:F,"Sim",${g}!G2:G)`],
     ["Famílias que não vêm", `=COUNTIF(${g}!F2:F,"Não")`],
-    ["Com restrições alimentares", `=COUNTIFS(${g}!F2:F,"Sim",${g}!I2:I,"<>")`],
+    ["Pessoas com alergias", `=COUNTIF(${d}!F2:F,"?*")`],
+    ["", ""],
   ]);
+  summary.getRange("D1").setValue("Prato de peixe").setFontWeight("bold");
+  summary.getRange("D2").setFormula(`=IFERROR(QUERY(${d}!D2:D,"select D, count(D) where D is not null group by D label count(D) ''",0),"—")`);
+  summary.getRange("G1").setValue("Prato de carne").setFontWeight("bold");
+  summary.getRange("G2").setFormula(`=IFERROR(QUERY(${d}!E2:E,"select E, count(E) where E is not null group by E label count(E) ''",0),"—")`);
   summary.getRange("A1").setFontWeight("bold").setFontSize(14);
   summary.setColumnWidth(1, 240);
+  summary.setColumnWidth(4, 240);
+  summary.setColumnWidth(7, 240);
 }
 
 /** Fills an invite code for every household row that has a name but no code. */
@@ -116,9 +150,7 @@ function generateMissingCodes() {
 
 /** Shows "CODE;Name" lines for households with a physical invite, to paste into invite.html. */
 function showPrintList() {
-  const sheet = SpreadsheetApp.getActive().getSheetByName(GUESTS_SHEET);
-  const last = sheet.getLastRow();
-  const rows = last < 2 ? [] : sheet.getRange(2, 1, last - 1, HEADERS.length).getValues();
+  const rows = guestRows_();
   const lines = rows
     .filter((r) => r[COL.code - 1] && r[COL.name - 1] && ["Físico", "Ambos"].includes(r[COL.inviteType - 1]))
     .map((r) => `${r[COL.code - 1]};${r[COL.name - 1]}`);
@@ -127,6 +159,76 @@ function showPrintList() {
     `<textarea style="width:100%;height:300px" readonly>${escapeHtml_(lines.join("\n"))}</textarea>`
   ).setWidth(520).setHeight(400);
   SpreadsheetApp.getUi().showModalDialog(html, "Convites físicos");
+}
+
+// ------------------------------------------------------------------ reminders
+
+/** Rebuilds the "Lembretes" tab: every household without an answer, with its link and a ready WhatsApp message. */
+function refreshReminders() {
+  const ss = SpreadsheetApp.getActive();
+  const sheet = ss.getSheetByName(REMINDERS_SHEET) || ss.insertSheet(REMINDERS_SHEET);
+  sheet.clear();
+  const pending = pendingHouseholds_();
+  const header = ["Nome no convite", "Lugares", "Tipo de convite", "Contacto", "Link pessoal", "Enviar por WhatsApp"];
+  sheet.getRange(1, 1, 1, header.length).setValues([header]).setFontWeight("bold")
+    .setBackground("#0c3362").setFontColor("#ffffff");
+  sheet.setFrozenRows(1);
+  if (pending.length) {
+    const rows = pending.map((h) => {
+      const link = personalLink_(h.code);
+      const phone = whatsappNumber_(h.contact);
+      const wa = phone
+        ? `=HYPERLINK("https://wa.me/${phone}?text=${encodeURIComponent(reminderText_(h.name, link))}","Abrir WhatsApp")`
+        : "sem telemóvel";
+      return [h.name, h.seats, h.inviteType, h.contact, link, wa];
+    });
+    sheet.getRange(2, 1, rows.length, header.length).setValues(rows);
+  }
+  sheet.autoResizeColumns(1, 4);
+  sheet.setColumnWidth(5, 360);
+  ss.toast(`${pending.length} família(s) por responder.`, "Lembretes");
+}
+
+/** Weekly email to the couple with who is still missing, from 6 weeks before the first deadline until the final one. */
+function weeklyReminder() {
+  const today = todayLisbon_();
+  const start = shiftDays_(FIRST_DEADLINE, -42);
+  if (today < start || today > FINAL_DEADLINE) return;
+  const pending = pendingHouseholds_();
+  if (!pending.length) return;
+  refreshReminders();
+  const deadline = today <= FIRST_DEADLINE ? FIRST_DEADLINE : FINAL_DEADLINE;
+  const days = Math.round((Date.parse(deadline) - Date.parse(today)) / 864e5);
+  const seats = pending.reduce((n, h) => n + (Number(h.seats) || 0), 0);
+  const list = pending.map((h) => `<li>${escapeHtml_(h.name)} — ${h.seats} lugar(es)${h.contact ? ` — ${escapeHtml_(h.contact)}` : ""}</li>`).join("");
+  MailApp.sendEmail({
+    to: notifyTo_(),
+    subject: `Casamento: ${pending.length} família(s) por responder (faltam ${days} dias para o prazo)`,
+    htmlBody:
+      `<p>Ainda faltam responder <b>${pending.length}</b> famílias (${seats} lugares). Prazo: ${deadline}.</p>` +
+      `<ul>${list}</ul>` +
+      `<p>No separador <b>Lembretes</b> da folha tem o link pessoal de cada família e um botão para enviar a mensagem por WhatsApp.</p>` +
+      `<p><a href="${SpreadsheetApp.getActive().getUrl()}">Abrir a folha</a></p>`,
+  });
+}
+
+function enableWeeklyReminders() {
+  disableWeeklyReminders(true);
+  ScriptApp.newTrigger("weeklyReminder").timeBased().onWeekDay(ScriptApp.WeekDay.MONDAY).atHour(9).create();
+  SpreadsheetApp.getActive().toast("Lembretes semanais ativos (segundas-feiras às 9h).", "Lembretes");
+}
+
+function disableWeeklyReminders(silent) {
+  ScriptApp.getProjectTriggers()
+    .filter((t) => t.getHandlerFunction() === "weeklyReminder")
+    .forEach((t) => ScriptApp.deleteTrigger(t));
+  if (silent !== true) SpreadsheetApp.getActive().toast("Lembretes semanais desativados.", "Lembretes");
+}
+
+function sendTestEmail() {
+  MailApp.sendEmail(notifyTo_(), "Casamento: email de teste",
+    "Os avisos de novas respostas vão chegar a este endereço.");
+  SpreadsheetApp.getActive().toast(`Email enviado para ${notifyTo_()}.`, "Casamento");
 }
 
 // ------------------------------------------------------------------ web app
@@ -154,6 +256,8 @@ function lookup_(code) {
   if (!found) return { ok: false, error: "not_found" };
   const r = found.values;
   const answered = r[COL.response - 1];
+  let people = [];
+  try { people = JSON.parse(r[COL.detail - 1] || "[]"); } catch (err) { people = []; }
   return {
     ok: true,
     household: {
@@ -166,6 +270,7 @@ function lookup_(code) {
         names: String(r[COL.names - 1] || ""),
         dietary: String(r[COL.dietary - 1] || ""),
         message: String(r[COL.message - 1] || ""),
+        people,
         updatedAt: r[COL.updatedAt - 1] ? new Date(r[COL.updatedAt - 1]).toISOString() : null,
       } : null,
     },
@@ -180,45 +285,150 @@ function saveRsvp_(body) {
 
   const lock = LockService.getScriptLock();
   lock.waitLock(10000);
+  let household, record;
   try {
     const found = findRow_(code);
     if (!found) return { ok: false, error: "not_found" };
     const seats = Number(found.values[COL.seats - 1]) || 1;
-    const count = attending === "yes" ? clamp_(Number(body.count) || 1, 1, seats) : 0;
-    const clean = (s, max) => String(s || "").replace(/^[=+\-@]+/, "").slice(0, max); // block formula injection
-    const names = attending === "yes" ? clean(body.names, 400) : "";
-    const dietary = attending === "yes" ? clean(body.dietary, 300) : "";
-    const message = clean(body.message, 1000);
-    const now = new Date();
+    household = String(found.values[COL.name - 1]);
 
-    found.sheet.getRange(found.row, COL.response, 1, 7).setValues([[
-      attending === "yes" ? "Sim" : "Não", count, names, dietary, message, now, "Site",
-    ]]);
-    SpreadsheetApp.getActive().getSheetByName(LOG_SHEET).appendRow([
-      now, code, found.values[COL.name - 1], attending === "yes" ? "Sim" : "Não", count, names, dietary, message,
-    ]);
-    return { ok: true };
+    // per-guest details (name, dishes, allergies), capped at the seats reserved
+    const people = attending === "yes" && Array.isArray(body.people)
+      ? body.people.slice(0, seats).map((p) => ({
+          name: clean_(p && p.name, 120),
+          fish: clean_(p && p.fish, 40),
+          meat: clean_(p && p.meat, 40),
+          allergies: clean_(p && p.allergies, 200),
+          labels: {
+            fish: clean_(p && p.labels && p.labels.fish, 120),
+            meat: clean_(p && p.labels && p.labels.meat, 120),
+          },
+        })).filter((p) => p.name)
+      : [];
+    const count = attending === "yes" ? clamp_(people.length || Number(body.count) || 1, 1, seats) : 0;
+    const names = attending === "yes" ? (people.length ? people.map((p) => p.name).join(", ") : clean_(body.names, 400)) : "";
+    const dietary = attending === "yes"
+      ? (people.length ? people.filter((p) => p.allergies).map((p) => `${p.name}: ${p.allergies}`).join("; ") : clean_(body.dietary, 300))
+      : "";
+    const message = clean_(body.message, 1000);
+    const now = new Date();
+    const answer = attending === "yes" ? "Sim" : "Não";
+
+    found.sheet.getRange(found.row, COL.response, 1, 7).setValues([[answer, count, names, dietary, message, now, "Site"]]);
+    found.sheet.getRange(found.row, COL.detail).setValue(JSON.stringify(people));
+    SpreadsheetApp.getActive().getSheetByName(LOG_SHEET).appendRow([now, code, household, answer, count, names, dietary, message]);
+    writeDishes_(code, household, people, now);
+    record = { code, household, answer, count, seats, people, message, dietary, names };
   } finally {
     lock.releaseLock();
+  }
+  notify_(record);
+  return { ok: true };
+}
+
+/** Replaces this household's rows in the "Pratos" tab with one row per guest. */
+function writeDishes_(code, household, people, when) {
+  const sheet = SpreadsheetApp.getActive().getSheetByName(DISHES_SHEET);
+  if (!sheet) return;
+  const last = sheet.getLastRow();
+  if (last >= 2) {
+    const codes = sheet.getRange(2, 1, last - 1, 1).getValues();
+    for (let i = codes.length - 1; i >= 0; i--) {
+      if (normalizeCode_(codes[i][0]) === code) sheet.deleteRow(i + 2);
+    }
+  }
+  if (!people.length) return;
+  const rows = people.map((p) => [code, household, p.name, p.labels.fish || p.fish, p.labels.meat || p.meat, p.allergies, when]);
+  sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, DISH_HEADERS.length).setValues(rows);
+}
+
+/** Emails the couple about a new or changed answer. Never blocks the guest's RSVP. */
+function notify_(r) {
+  if (!r) return;
+  try {
+    const guests = r.people.length
+      ? `<ul>${r.people.map((p) => `<li><b>${escapeHtml_(p.name)}</b> — ${escapeHtml_(p.labels.fish || "")} · ${escapeHtml_(p.labels.meat || "")}${p.allergies ? ` — <i>alergias: ${escapeHtml_(p.allergies)}</i>` : ""}</li>`).join("")}</ul>`
+      : (r.names ? `<p>${escapeHtml_(r.names)}</p>` : "");
+    MailApp.sendEmail({
+      to: notifyTo_(),
+      subject: `RSVP: ${r.household} — ${r.answer === "Sim" ? `Sim (${r.count} de ${r.seats})` : "Não vem"}`,
+      htmlBody:
+        `<p><b>${escapeHtml_(r.household)}</b> respondeu <b>${r.answer}</b>${r.answer === "Sim" ? ` — ${r.count} de ${r.seats} lugares` : ""}.</p>` +
+        guests +
+        (r.message ? `<p>Mensagem: “${escapeHtml_(r.message)}”</p>` : "") +
+        `<p><a href="${SpreadsheetApp.getActive().getUrl()}">Abrir a folha</a></p>`,
+    });
+  } catch (err) {
+    console.error("notify failed: " + err);
   }
 }
 
 // ------------------------------------------------------------------ helpers
 
-function findRow_(code) {
+function guestRows_() {
   const sheet = SpreadsheetApp.getActive().getSheetByName(GUESTS_SHEET);
   const last = sheet.getLastRow();
-  if (last < 2) return null;
-  const values = sheet.getRange(2, 1, last - 1, HEADERS.length).getValues();
+  return last < 2 ? [] : sheet.getRange(2, 1, last - 1, HEADERS.length).getValues();
+}
+
+function pendingHouseholds_() {
+  return guestRows_()
+    .filter((r) => r[COL.code - 1] && r[COL.name - 1] && !r[COL.response - 1])
+    .map((r) => ({
+      code: normalizeCode_(r[COL.code - 1]),
+      name: String(r[COL.name - 1]),
+      seats: Number(r[COL.seats - 1]) || 1,
+      inviteType: String(r[COL.inviteType - 1] || ""),
+      contact: String(r[COL.contact - 1] || ""),
+    }));
+}
+
+function findRow_(code) {
+  const sheet = SpreadsheetApp.getActive().getSheetByName(GUESTS_SHEET);
+  const values = guestRows_();
   for (let i = 0; i < values.length; i++) {
     if (normalizeCode_(values[i][0]) === code) return { sheet, row: i + 2, values: values[i] };
   }
   return null;
 }
 
+function personalLink_(code) {
+  return `${SITE_URL}?c=${encodeURIComponent(code)}`;
+}
+
+function reminderText_(name, link) {
+  return `Olá, ${name}! Ainda não recebemos a vossa confirmação para o nosso casamento, a 24 de setembro de 2027. ` +
+    `Podem responder aqui: ${link}\nUm beijinho, ${COUPLE}`;
+}
+
+/** "+351 912 345 678", "912345678" → "351912345678"; anything else without enough digits → "". */
+function whatsappNumber_(raw) {
+  let digits = String(raw || "").replace(/\D/g, "");
+  if (digits.startsWith("00")) digits = digits.slice(2);
+  if (digits.length === 9 && digits.startsWith("9")) digits = "351" + digits;
+  return digits.length >= 11 ? digits : "";
+}
+
+function notifyTo_() {
+  return NOTIFY_EMAILS || Session.getEffectiveUser().getEmail();
+}
+
+function todayLisbon_() {
+  return Utilities.formatDate(new Date(), "Europe/Lisbon", "yyyy-MM-dd");
+}
+
+function shiftDays_(isoDay, n) {
+  const d = new Date(isoDay + "T12:00:00Z");
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+
 function isClosed_() {
-  const today = Utilities.formatDate(new Date(), "Europe/Lisbon", "yyyy-MM-dd");
-  return today > FINAL_DEADLINE;
+  return todayLisbon_() > FINAL_DEADLINE;
+}
+
+function clean_(s, max) {
+  return String(s || "").replace(/^[=+\-@]+/, "").slice(0, max); // block formula injection
 }
 
 function normalizeCode_(raw) {

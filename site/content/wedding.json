@@ -1,20 +1,16 @@
 {
   "_comment": "Single source of truth for the wedding content. Both the website (index.html) and the printed invite (invite.html) read this file. Guest-facing text is in European Portuguese.",
-
   "couple": {
     "first": "André",
     "second": "Flávia",
     "joined": "André & Flávia"
   },
-
   "date": {
     "iso": "2027-09-24",
     "display": "Sexta-feira, 24 de setembro de 2027",
     "short": "24 · 09 · 2027"
   },
-
   "timezone": "Europe/Lisbon",
-
   "events": [
     {
       "id": "ceremony",
@@ -39,7 +35,6 @@
       "mapUrl": "https://www.google.com/maps/place//data=!4m2!3m1!1s0xd248c898f55de55:0x79238a8479d8a1bc"
     }
   ],
-
   "menu": {
     "draft": true,
     "note": "Menu provisório — a versão final será publicada aqui.",
@@ -55,27 +50,63 @@
       },
       {
         "title": "Prato de peixe",
-        "items": ["Lombo de bacalhau confitado, puré de grão e azeite de ervas"]
+        "items": [
+          "Lombo de bacalhau confitado, puré de grão e azeite de ervas",
+          "Filete de robalo grelhado com risotto de limão"
+        ],
+        "choice": "fish",
+        "options": [
+          {
+            "id": "bacalhau",
+            "label": "Lombo de bacalhau confitado"
+          },
+          {
+            "id": "robalo",
+            "label": "Filete de robalo grelhado"
+          }
+        ],
+        "_todo": "Dummy options — replace when the menu is final"
       },
       {
         "title": "Corta-sabores",
-        "items": ["Sorbet de limão com espumante"]
+        "items": [
+          "Sorbet de limão com espumante"
+        ]
       },
       {
         "title": "Prato de carne",
-        "items": ["Lombo de vitela com molho de vinho do Porto, batata assada e legumes da época"]
+        "items": [
+          "Lombo de vitela com molho de vinho do Porto, batata assada e legumes da época",
+          "Bochecha de porco preto estufada com puré de batata-doce"
+        ],
+        "choice": "meat",
+        "options": [
+          {
+            "id": "vitela",
+            "label": "Lombo de vitela"
+          },
+          {
+            "id": "porco",
+            "label": "Bochecha de porco preto"
+          }
+        ],
+        "_todo": "Dummy options — replace when the menu is final"
       },
       {
         "title": "Sobremesa",
-        "items": ["Bolo dos noivos e mesa de doces tradicionais"]
+        "items": [
+          "Bolo dos noivos e mesa de doces tradicionais"
+        ]
       },
       {
         "title": "Ceia",
-        "items": ["Caldo verde, pão com chouriço e tábua de frios"]
+        "items": [
+          "Caldo verde, pão com chouriço e tábua de frios"
+        ]
       }
-    ]
+    ],
+    "choiceNote": "À escolha — indique a sua preferência na confirmação de presença."
   },
-
   "rsvp": {
     "deadline": "2027-06-24",
     "deadlineDisplay": "24 de junho de 2027",
@@ -84,12 +115,16 @@
     "lateNote": "O prazo de confirmação terminou, mas ainda conseguimos receber a sua resposta. Obrigado por nos avisar o quanto antes!",
     "closedNote": "As confirmações estão encerradas. Se precisar de alterar a sua resposta, fale diretamente connosco."
   },
-
   "contacts": [
-    { "name": "André", "phone": "+351 900 000 000", "_todo": "Replace with real phone number" },
-    { "name": "Flávia", "phone": "+351 900 000 001", "_todo": "Replace with real phone number" }
+    {
+      "name": "André",
+      "phone": "+351 910 344 163"
+    },
+    {
+      "name": "Flávia",
+      "phone": "+351 911 877 885"
+    }
   ],
-
   "info": [
     {
       "title": "Entre a igreja e a quinta",
@@ -105,11 +140,6 @@
       "title": "Traje",
       "text": "Formal. As cores do nosso dia são o azul e o dourado — se quiserem acompanhar-nos, serão muito bem-vindas.",
       "_todo": "Confirm dress code"
-    },
-    {
-      "title": "Presentes",
-      "text": "A vossa presença é o melhor presente. Para quem desejar, partilharemos aqui o IBAN dos noivos.",
-      "_todo": "Add IBAN or gift list"
     }
   ]
 }

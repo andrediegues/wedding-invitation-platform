@@ -62,7 +62,7 @@ function back(c, h) {
         <div class="menu">
           <p class="kicker">Menu</p>
           ${c.menu.courses.map((course) => `
-            <p class="course"><span>${esc(course.title)}</span>${course.items.map(esc).join(" · ")}</p>`).join("")}
+            <p class="course"><span>${esc(course.title)}</span>${course.items.map(esc).join(course.choice ? " <em>ou</em> " : " · ")}</p>`).join("")}
         </div>
         <div class="sprig-wrap">${DIVIDER}</div>
         <div class="rsvp">
