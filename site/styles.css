@@ -1,19 +1,19 @@
 /* ------------------------------------------------------------------ tokens */
 :root {
-  --ink: #14294b;
-  --blue: #1f4e8c;
-  --blue-soft: #dfe8f3;
-  --gold: #b08a3e;
-  --gold-deep: #8e6d2c;
-  --gold-soft: #e9dcbc;
-  --cream: #fbf7ef;
-  --paper: #fffdf8;
-  --muted: #5b6b82;
+  --ink: #0c3362;
+  --blue: #2a5c95;
+  --blue-soft: #e3ecf4;
+  --gold: #dcad79;
+  --gold-deep: #8a6230;
+  --gold-soft: #eedcc0;
+  --cream: #f8f1e6;
+  --paper: #fffbf5;
+  --muted: #4f6079;
   --danger: #9b2c2c;
   --radius: 14px;
   --serif: "Cormorant Garamond", "Times New Roman", serif;
   --sans: "Jost", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --shadow: 0 1px 2px rgba(20, 41, 75, .06), 0 8px 28px rgba(20, 41, 75, .08);
+  --shadow: 0 1px 2px rgba(12, 51, 98, .06), 0 8px 28px rgba(12, 51, 98, .08);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -54,7 +54,7 @@ strong { font-weight: 500; }
   margin-bottom: .6rem;
 }
 
-.sprig-wrap { color: var(--gold); display: flex; justify-content: center; margin: .9rem 0 0; }
+.sprig-wrap { color: #b8884f; display: flex; justify-content: center; margin: .9rem 0 0; }
 .sprig { width: 140px; height: 22px; }
 
 /* ------------------------------------------------------------------ top bar */
@@ -87,20 +87,21 @@ strong { font-weight: 500; }
 
 /* ------------------------------------------------------------------ azulejo frieze */
 .frieze {
-  height: 56px;
-  background: url("assets/azulejo.svg") repeat-x center / 56px 56px;
-  border-bottom: 3px solid var(--gold);
+  height: 64px;
+  background: var(--ink) url("assets/marble.jpg") center / cover;
+  border-bottom: 2px solid var(--gold);
 }
-.frieze--bottom { border-bottom: 0; border-top: 3px solid var(--gold); }
+.frieze--bottom { border-bottom: 0; border-top: 2px solid var(--gold); background-position: center 70%; }
 
 /* ------------------------------------------------------------------ hero */
 .hero {
-  background:
-    radial-gradient(ellipse at 50% 0%, rgba(31, 78, 140, .07), transparent 60%),
-    var(--paper);
+  background: #c3d3e0 url("assets/silk.jpg") center / cover;
   text-align: center;
 }
-.hero__inner { padding: 64px 16px 72px; max-width: 760px; margin: 0 auto; }
+.hero__inner { padding: 48px 16px 64px; max-width: 760px; margin: 0 auto; }
+.hero__mono { width: 168px; margin: 0 auto 18px; }
+.monogram { display: block; width: 100%; height: auto; overflow: visible; }
+@media (min-width: 720px) { .hero__mono { width: 200px; } }
 .hero__greeting {
   font-family: var(--serif); font-style: italic; font-size: 1.5rem; color: var(--blue);
   margin-bottom: 1.25rem;
@@ -111,7 +112,7 @@ strong { font-weight: 500; }
   letter-spacing: .01em;
   color: var(--ink);
 }
-.hero__names .amp { display: block; font-style: italic; color: var(--gold); font-size: .6em; line-height: 1.1; }
+.hero__names .amp { display: block; font-style: italic; color: var(--gold-deep); font-size: .6em; line-height: 1.1; }
 @media (min-width: 720px) {
   .hero__names .amp { display: inline; font-size: .8em; padding: 0 .1em; }
 }
@@ -123,8 +124,8 @@ strong { font-weight: 500; }
 .countdown { display: flex; justify-content: center; gap: 12px; margin: 2rem 0 2.2rem; min-height: 86px; }
 .countdown > div {
   min-width: 84px; padding: 12px 8px 10px;
-  border: 1px solid var(--gold-soft); border-radius: var(--radius);
-  background: var(--cream);
+  border: 1px solid var(--gold); border-radius: var(--radius);
+  background: rgba(255, 251, 245, .78);
 }
 .countdown span { display: block; font-family: var(--serif); font-size: 2.1rem; line-height: 1; color: var(--blue); }
 .countdown small { font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
@@ -142,8 +143,8 @@ strong { font-weight: 500; }
 }
 .button:hover { background: var(--blue); border-color: var(--blue); }
 .button:disabled { opacity: .6; cursor: progress; }
-.button--gold { background: var(--gold); border-color: var(--gold); color: #fff; }
-.button--gold:hover { background: var(--gold-deep); border-color: var(--gold-deep); }
+.button--gold { background: var(--gold); border-color: var(--gold); color: var(--ink); }
+.button--gold:hover { background: #cf9b62; border-color: #cf9b62; }
 .button--ghost { background: transparent; color: var(--ink); }
 .button--ghost:hover { background: var(--ink); color: var(--paper); }
 
@@ -167,8 +168,8 @@ strong { font-weight: 500; }
 .section { padding: 80px 16px; }
 .section--tinted {
   background:
-    linear-gradient(rgba(223, 232, 243, .82), rgba(223, 232, 243, .82)),
-    url("assets/azulejo.svg") repeat center / 72px 72px;
+    linear-gradient(rgba(227, 236, 244, .55), rgba(227, 236, 244, .55)),
+    #c3d3e0 url("assets/silk.jpg") center / cover;
 }
 .section__head { text-align: center; margin-bottom: 2.75rem; }
 .section__head h2 { font-size: clamp(2.3rem, 7vw, 3.2rem); }
@@ -238,8 +239,8 @@ strong { font-weight: 500; }
 /* ------------------------------------------------------------------ RSVP */
 .section--rsvp {
   background:
-    linear-gradient(rgba(20, 41, 75, .9), rgba(20, 41, 75, .9)),
-    url("assets/azulejo.svg") repeat center / 90px 90px;
+    linear-gradient(rgba(12, 51, 98, .45), rgba(12, 51, 98, .45)),
+    var(--ink) url("assets/marble.jpg") center / cover;
 }
 .rsvp-card {
   max-width: 600px; margin: 0 auto; background: var(--paper);

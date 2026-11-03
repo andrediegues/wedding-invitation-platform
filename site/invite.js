@@ -1,4 +1,4 @@
-import { esc, loadContent, normalizeCode, OLIVE_SPRIG, personalLink } from "./shared.js";
+import { esc, loadContent, normalizeCode, DIVIDER, MONOGRAM, personalLink } from "./shared.js";
 import qrcode from "./vendor/qrcode.mjs";
 
 const $ = (sel) => document.querySelector(sel);
@@ -36,14 +36,14 @@ function front(c, h) {
     <section class="sheet sheet--front">
       <div class="band"></div>
       <div class="sheet__body">
-        <p class="kicker">Vamos casar</p>
+        <div class="mono">${MONOGRAM}</div>
         ${h.name ? `
           <p class="intro">Com muita alegria, convidamos</p>
           <p class="guest">${esc(h.name)}</p>
           <p class="intro">para celebrar connosco o nosso casamento</p>
         ` : `<p class="intro">Com muita alegria, convidamos-vos a celebrar connosco o nosso casamento</p>`}
         <h2 class="names">${esc(c.couple.first)}<span class="amp">&amp;</span>${esc(c.couple.second)}</h2>
-        <div class="sprig-wrap">${OLIVE_SPRIG}</div>
+        <div class="sprig-wrap">${DIVIDER}</div>
         <p class="date">${esc(c.date.display)}</p>
         <div class="events">${eventBlock(ceremony)}<span class="events__rule"></span>${eventBlock(reception)}</div>
       </div>
@@ -64,7 +64,7 @@ function back(c, h) {
           ${c.menu.courses.map((course) => `
             <p class="course"><span>${esc(course.title)}</span>${course.items.map(esc).join(" · ")}</p>`).join("")}
         </div>
-        <div class="sprig-wrap">${OLIVE_SPRIG}</div>
+        <div class="sprig-wrap">${DIVIDER}</div>
         <div class="rsvp">
           <p class="rsvp__title">Confirme a sua presença<br>até ${esc(c.rsvp.deadlineDisplay)}</p>
           <div class="rsvp__grid">

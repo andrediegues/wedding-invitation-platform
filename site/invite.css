@@ -1,10 +1,10 @@
 :root {
-  --ink: #14294b;
-  --blue: #1f4e8c;
-  --gold: #b08a3e;
-  --gold-deep: #8e6d2c;
-  --paper: #fffdf8;
-  --muted: #55657c;
+  --ink: #0c3362;
+  --blue: #2a5c95;
+  --gold: #dcad79;
+  --gold-deep: #8a6230;
+  --paper: #fffbf5;
+  --muted: #4f6079;
   --serif: "Cormorant Garamond", "Times New Roman", serif;
   --sans: "Jost", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
@@ -43,22 +43,23 @@ p { margin: 0; }
 /* ------------------------------------------------------------------ A5 sheet */
 .sheet {
   width: 148mm; height: 210mm; flex: none;
-  background: var(--paper);
+  background: #c3d3e0 url("assets/silk.jpg") center / cover;
   position: relative; overflow: hidden;
   display: flex; flex-direction: column;
   box-shadow: 0 6px 24px rgba(0,0,0,.15);
 }
 .band {
   height: 13mm; flex: none;
-  background: url("assets/azulejo.svg") repeat-x center / 13mm 13mm;
-  border-bottom: .6mm solid var(--gold);
+  background: var(--ink) url("assets/marble.jpg") center / cover;
+  border-bottom: .5mm solid var(--gold);
 }
-.band--bottom { border-bottom: 0; border-top: .6mm solid var(--gold); }
+.band--bottom { border-bottom: 0; border-top: .5mm solid var(--gold); background-position: center 70%; }
 
 .sheet__body {
   flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
   text-align: center; padding: 6mm 13mm;
   margin: 4mm; border: .25mm solid var(--gold); outline: .25mm solid var(--gold); outline-offset: -1.6mm;
+  background: #fffbf5;
 }
 
 .kicker {
@@ -112,3 +113,10 @@ p { margin: 0; }
   .sheet { box-shadow: none; break-after: page; page-break-after: always; }
   .sheet:last-child { break-after: auto; page-break-after: auto; }
 }
+
+.mono { width: 26mm; margin-bottom: 3mm; }
+.monogram { display: block; width: 100%; height: auto; overflow: visible; }
+.sheet--front .names { margin-top: 4mm; font-size: 32pt; }
+.sheet--front .events { margin-top: 5mm; }
+.sprig-wrap { color: #b8884f; }
+.qr svg path, .qr svg rect[fill="black"] { fill: var(--ink); }

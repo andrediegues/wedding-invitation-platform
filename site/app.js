@@ -1,5 +1,5 @@
 import {
-  api, codeFromUrl, esc, loadContent, normalizeCode, OLIVE_SPRIG, rsvpPhase, zonedDate,
+  api, codeFromUrl, esc, loadContent, normalizeCode, DIVIDER, MONOGRAM, rsvpPhase, zonedDate,
 } from "./shared.js";
 
 const $ = (sel) => document.querySelector(sel);
@@ -18,7 +18,8 @@ function forgetCode() {
 // ---------------------------------------------------------------- render: static content
 
 function renderStatic(c) {
-  document.querySelectorAll("[data-sprig]").forEach((el) => { el.innerHTML = OLIVE_SPRIG; });
+  document.querySelectorAll("[data-sprig]").forEach((el) => { el.innerHTML = DIVIDER; });
+  document.querySelectorAll("[data-monogram]").forEach((el) => { el.innerHTML = MONOGRAM; });
 
   $("#names").innerHTML = `${esc(c.couple.first)} <span class="amp">&amp;</span> ${esc(c.couple.second)}`;
   $("#footer-names").textContent = c.couple.joined;

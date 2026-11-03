@@ -13,6 +13,12 @@ with the same information for guests who prefer paper.
 - **Private guest list.** Guests and answers live in a Google Sheet behind a small Apps Script
   ([`backend/`](backend/)); nothing about guests is committed here.
 
+## Design
+
+Navy and gold: palette #0C3362 · #6EA6CD · #C3D3E0 · #DCAD79 · #F4E7D6, navy/gold alcohol-ink
+marble bands, a pale blue silk background with gold sparkles, and an arched A F monogram with
+waves and a scallop shell (`MONOGRAM` in `site/shared.js`).
+
 ## How it works
 
 ```
@@ -43,12 +49,14 @@ site/
   shared.js                        content loading, API client, time-zone helpers
   config.js                        apiUrl (Apps Script) and public siteUrl
   content/wedding.json             all event content
-  assets/azulejo.svg               tile pattern used across the design
+  assets/marble.jpg, silk.jpg      navy/gold marble and blue silk backgrounds (tools/make_backgrounds.py)
+  assets/favicon.svg               gold star icon
   vendor/qrcode.mjs                qrcode-generator 2.0.4 (MIT)
 backend/
   apps-script/Code.gs              RSVP API + sheet helpers
   README.md                        setup guide for the Google Sheet
 .github/workflows/pages.yml        deploys site/ to GitHub Pages
+tools/make_backgrounds.py          regenerates the background images
 ```
 
 ## Run locally
