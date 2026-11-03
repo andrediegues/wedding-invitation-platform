@@ -1,6 +1,6 @@
 import {
   api, codeFromUrl, esc, loadContent, normalizeCode, DIVIDER, MONOGRAM, rsvpPhase, zonedDate,
-} from "./shared.js";
+} from "./shared.js?v=dev";
 
 const $ = (sel) => document.querySelector(sel);
 const CODE_KEY = "wedding-guest-code";

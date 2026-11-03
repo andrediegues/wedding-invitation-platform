@@ -1,5 +1,5 @@
-import { esc, loadContent, normalizeCode, DIVIDER, MONOGRAM, personalLink } from "./shared.js";
-import qrcode from "./vendor/qrcode.mjs";
+import { esc, loadContent, normalizeCode, DIVIDER, MONOGRAM, personalLink } from "./shared.js?v=dev";
+import qrcode from "./vendor/qrcode.mjs?v=dev";
 
 const $ = (sel) => document.querySelector(sel);
 const STORE_KEY = "wedding-print-list";

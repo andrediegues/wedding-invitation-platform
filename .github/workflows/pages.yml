@@ -24,6 +24,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+      # Cache-busting: every deploy gets new asset URLs, so guests always load the latest version.
+      - name: Stamp asset URLs with the commit
+        run: |
+          v="${GITHUB_SHA::7}"
+          grep -rl '?v=dev' site | xargs sed -i "s/?v=dev/?v=${v}/g"
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
