@@ -41,7 +41,7 @@ function front(c, h) {
           <p class="intro">Com muita alegria, convidamos</p>
           <p class="guest">${esc(h.name)}</p>
           <p class="intro">para celebrar connosco o nosso casamento</p>
-        ` : `<p class="intro">Com muita alegria, convidamos-vos a celebrar connosco o nosso casamento</p>`}
+        ` : `<p class="intro">Com muita alegria, convidamos-vos<br>a celebrar connosco o nosso casamento</p>`}
         <h2 class="names">${esc(c.couple.first)}<span class="amp">&amp;</span>${esc(c.couple.second)}</h2>
         <div class="sprig-wrap">${DIVIDER}</div>
         <p class="date">${esc(c.date.display)}</p>
