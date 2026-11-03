@@ -120,7 +120,7 @@ function rsvpKicker() {
   const text = {
     open: `Até ${r.deadlineDisplay}`,
     late: `Até ${r.finalDeadlineDisplay}`,
-    closed: "Confirmações encerradas",
+    closed: "Respostas encerradas",
   }[state.phase];
   $("#rsvp-kicker").textContent = text;
 }
@@ -371,7 +371,7 @@ function renderForm() {
       btn.disabled = false;
       btn.textContent = "Enviar resposta";
       err.innerHTML = e.message === "closed"
-        ? `As confirmações já fecharam. Fale connosco: ${contactLine()}`
+        ? `As respostas ao convite já fecharam. Fale connosco: ${contactLine()}`
         : `Não conseguimos guardar a resposta. Tente de novo ou fale connosco: ${contactLine()}`;
       err.hidden = false;
     }

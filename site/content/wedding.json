@@ -114,16 +114,16 @@
         ]
       }
     ],
-    "choiceNote": "À escolha — indique a sua preferência na confirmação de presença.",
-    "dietNote": "Temos opções vegetarianas e vegan. Se for o seu caso, indique-o nas notas de cada convidado, na confirmação de presença."
+    "choiceNote": "À escolha — indique a sua preferência na resposta ao convite.",
+    "dietNote": "Temos opções vegetarianas e vegan. Se for o seu caso, indique-o nas notas de cada convidado, na resposta ao convite."
   },
   "rsvp": {
     "deadline": "2027-06-24",
     "deadlineDisplay": "24 de junho de 2027",
     "finalDeadline": "2027-08-24",
     "finalDeadlineDisplay": "24 de agosto de 2027",
-    "lateNote": "O prazo de confirmação terminou, mas ainda conseguimos receber a sua resposta. Obrigado por nos avisar o quanto antes!",
-    "closedNote": "As confirmações estão encerradas. Se precisar de alterar a sua resposta, fale diretamente connosco."
+    "lateNote": "O prazo de resposta terminou, mas ainda conseguimos receber a sua resposta. Obrigado por nos avisar o quanto antes!",
+    "closedNote": "As respostas ao convite estão encerradas. Se precisar de alterar a sua resposta, fale diretamente connosco."
   },
   "contacts": [
     {

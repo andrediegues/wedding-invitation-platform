@@ -397,7 +397,7 @@ function personalLink_(code) {
 }
 
 function reminderText_(name, link) {
-  return `Olá, ${name}! Ainda não recebemos a vossa confirmação para o nosso casamento, a 24 de setembro de 2027. ` +
+  return `Olá, ${name}! Ainda não recebemos a vossa resposta ao convite para o nosso casamento, a 24 de setembro de 2027. ` +
     `Podem responder aqui: ${link}\nUm beijinho, ${COUPLE}`;
 }
 

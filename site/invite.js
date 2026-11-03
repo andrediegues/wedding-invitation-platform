@@ -67,7 +67,7 @@ function back(c, h) {
         </div>
         <div class="sprig-wrap">${DIVIDER}</div>
         <div class="rsvp">
-          <p class="rsvp__title">Confirme a sua presença<br>até ${esc(c.rsvp.deadlineDisplay)}</p>
+          <p class="rsvp__title">Responda ao convite<br>até ${esc(c.rsvp.deadlineDisplay)}</p>
           <div class="rsvp__grid">
             <div class="rsvp__phones">
               <p class="rsvp__how">Por telefone</p>
