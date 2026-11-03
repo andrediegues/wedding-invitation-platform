@@ -55,6 +55,7 @@ function renderStatic(c) {
           : course.items.map((i) => `<p>${esc(i)}</p>`).join("")}
       </div>`).join('<span class="course__sep" aria-hidden="true">✦</span>')}
     ${m.choiceNote && m.courses.some((x) => x.choice) ? `<p class="menu-note">${esc(m.choiceNote)}</p>` : ""}
+    ${m.dietNote ? `<p class="menu-note menu-note--diet">${esc(m.dietNote)}</p>` : ""}
   `;
 
   $("#info-grid").innerHTML = c.info.map((i) => `
@@ -233,8 +234,8 @@ function personFieldset(i, person = {}) {
       </label>
       ${selects}
       <label class="field">
-        <span class="field__label">Alergias ou intolerâncias <em>(opcional)</em></span>
-        <input name="allergies-${i}" maxlength="200" value="${esc(person.allergies || "")}" placeholder="Ex.: marisco, glúten, frutos secos">
+        <span class="field__label">Notas: alergias, intolerâncias, vegetariano ou vegan <em>(opcional)</em></span>
+        <input name="allergies-${i}" maxlength="200" value="${esc(person.allergies || "")}" placeholder="Ex.: vegetariano, vegan, sem glúten, alergia a marisco">
       </label>
     </fieldset>`;
 }
@@ -274,7 +275,7 @@ function renderForm() {
           <span class="field__label">Quantas pessoas vêm?</span>
           <select name="count">${seatOptions}</select>
         </label>` : `<input type="hidden" name="count" value="1">`}
-        <p class="hint hint--left">Para cada pessoa, escolha o prato de peixe e o prato de carne e indique alergias, se houver.</p>
+        <p class="hint hint--left">Para cada pessoa, escolha o prato de peixe e o prato de carne. Temos opções vegetarianas e vegan: escolha essa opção e indique-o nas notas, junto com alergias ou intolerâncias.</p>
         <div id="guests"></div>
       </div>
 
@@ -332,6 +333,9 @@ function renderForm() {
       peopleOut = readPeople();
       for (let i = 0; i < peopleOut.length; i++) {
         if (!peopleOut[i].name) return fail(`Por favor escreva o nome do convidado ${i + 1}.`, form[`name-${i}`]);
+        if (choiceCourses().some((c) => peopleOut[i][c.choice] === "veg") && !peopleOut[i].allergies) {
+          return fail(`Indique nas notas de ${peopleOut[i].name} se é vegetariano ou vegan.`, form[`allergies-${i}`]);
+        }
         for (const c of choiceCourses()) {
           if (!peopleOut[i][c.choice]) {
             return fail(`Por favor escolha o ${c.title.toLowerCase()} de ${peopleOut[i].name}.`, form[`${c.choice}-${i}`]);
@@ -386,7 +390,7 @@ function renderSummary({ justSent = false } = {}) {
         <li>
           <strong>${esc(p.name)}</strong>
           <span>${choiceCourses().map((c) => esc(optionLabel(c.choice, p[c.choice]))).filter(Boolean).join(" · ")}</span>
-          ${p.allergies ? `<span class="guest-summary__allergy">Alergias: ${esc(p.allergies)}</span>` : ""}
+          ${p.allergies ? `<span class="guest-summary__allergy">Notas: ${esc(p.allergies)}</span>` : ""}
         </li>`).join("")}
     </ul>` : `
       ${r.names ? `<p class="summary__line"><span>Quem vem</span>${esc(r.names)}</p>` : ""}

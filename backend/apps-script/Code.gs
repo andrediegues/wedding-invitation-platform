@@ -49,7 +49,7 @@ const COL = {
   code: 1, name: 2, seats: 3, inviteType: 4, contact: 5, response: 6, count: 7,
   names: 8, dietary: 9, message: 10, updatedAt: 11, via: 12, notes: 13, detail: 14,
 };
-const DISH_HEADERS = ["Código", "Nome no convite", "Convidado", "Prato de peixe", "Prato de carne", "Alergias", "Atualizado em"];
+const DISH_HEADERS = ["Código", "Nome no convite", "Convidado", "Prato de peixe", "Prato de carne", "Notas (alergias, vegetariano/vegan)", "Atualizado em"];
 
 // ------------------------------------------------------------------ menu
 
@@ -113,7 +113,7 @@ function setup() {
     ["Famílias por responder", `=B2-B4`],
     ["Pessoas confirmadas", `=SUMIF(${g}!F2:F,"Sim",${g}!G2:G)`],
     ["Famílias que não vêm", `=COUNTIF(${g}!F2:F,"Não")`],
-    ["Pessoas com alergias", `=COUNTIF(${d}!F2:F,"?*")`],
+    ["Pessoas com notas (alergias, vegetariano/vegan)", `=COUNTIF(${d}!F2:F,"?*")`],
     ["", ""],
   ]);
   summary.getRange("D1").setValue("Prato de peixe").setFontWeight("bold");
@@ -347,7 +347,7 @@ function notify_(r) {
   if (!r) return;
   try {
     const guests = r.people.length
-      ? `<ul>${r.people.map((p) => `<li><b>${escapeHtml_(p.name)}</b> — ${escapeHtml_(p.labels.fish || "")} · ${escapeHtml_(p.labels.meat || "")}${p.allergies ? ` — <i>alergias: ${escapeHtml_(p.allergies)}</i>` : ""}</li>`).join("")}</ul>`
+      ? `<ul>${r.people.map((p) => `<li><b>${escapeHtml_(p.name)}</b> — ${escapeHtml_(p.labels.fish || "")} · ${escapeHtml_(p.labels.meat || "")}${p.allergies ? ` — <i>notas: ${escapeHtml_(p.allergies)}</i>` : ""}</li>`).join("")}</ul>`
       : (r.names ? `<p>${escapeHtml_(r.names)}</p>` : "");
     MailApp.sendEmail({
       to: notifyTo_(),

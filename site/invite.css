@@ -120,3 +120,4 @@ p { margin: 0; }
 .sheet--front .events { margin-top: 5mm; }
 .sprig-wrap { color: #b8884f; }
 .qr svg path, .qr svg rect[fill="black"] { fill: var(--ink); }
+.diet-note { font-style: italic; font-size: 10pt; color: var(--muted); margin-top: 1.5mm; }

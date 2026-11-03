@@ -66,6 +66,10 @@
           {
             "id": "pescada",
             "label": "Filetes de pescada"
+          },
+          {
+            "id": "veg",
+            "label": "Opção vegetariana / vegan"
           }
         ]
       },
@@ -90,6 +94,10 @@
           {
             "id": "porco",
             "label": "Lombo de porco assado"
+          },
+          {
+            "id": "veg",
+            "label": "Opção vegetariana / vegan"
           }
         ]
       },
@@ -106,7 +114,8 @@
         ]
       }
     ],
-    "choiceNote": "À escolha — indique a sua preferência na confirmação de presença."
+    "choiceNote": "À escolha — indique a sua preferência na confirmação de presença.",
+    "dietNote": "Temos opções vegetarianas e vegan. Se for o seu caso, indique-o nas notas de cada convidado, na confirmação de presença."
   },
   "rsvp": {
     "deadline": "2027-06-24",

@@ -339,3 +339,4 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--b
 .guest-summary strong { font-weight: 500; }
 .guest-summary span { color: var(--muted); font-size: .95rem; }
 .guest-summary__allergy { color: var(--gold-deep) !important; }
+.menu-note--diet { margin-top: .6rem; color: var(--gold-deep); }
